@@ -53,15 +53,19 @@ module.exports = {
                 ],
             },
             {
+                test: /\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    "css-loader"
+                ]
+            },
+            {
                 test: /\.js$/,
                 loader: 'babel-loader',
             },
             {
                 test: /\.vue$/,
-                loader: "vue-loader",
-                options: {
-                    extractCSS: true
-                }
+                loader: "vue-loader"
             },
             {
                 test: /\.(ttf|otf|eot|woff|woff2)$/,
