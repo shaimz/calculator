@@ -99,10 +99,11 @@
                 if (!isLoggedIn.value) {
                     let item = menu2.value.find((e) => e.to === n.value);
                     activeIndex2.value = item.index.toString();
+                    return true;
                 }
                 let item = menu.value.find((e) => e.to === n.value);
                 activeIndex.value = item.index.toString()
-
+                return true;
             },{immediate:true,deep:true})
 
             return {
@@ -120,6 +121,11 @@
 
 <style scoped lang="scss">
     .nav-link {
-        display: initial;
+        display: inline-block;
+        height: 60px;
+        width: 80px !important;
+        line-height: 60px;
+        padding: 0;
+        text-align: center;
     }
 </style>
