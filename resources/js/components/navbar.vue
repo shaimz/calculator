@@ -120,12 +120,15 @@
 </script>
 
 <style scoped lang="scss">
+    .el-menu-item{
+        padding:0 !important;
+    }
     .nav-link {
         display: inline-block;
         height: 60px;
         width: 80px !important;
         line-height: 60px;
-        padding: 0;
+        padding: 0 20px;
         text-align: center;
     }
 </style>

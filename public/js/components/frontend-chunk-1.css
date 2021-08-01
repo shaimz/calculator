@@ -1,11 +1,14 @@
 /*!*****************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/index.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[0]!./resources/js/components/navbar.vue?vue&type=style&index=0&id=11e733ca&scoped=true&lang=scss ***!
   \*****************************************************************************************************************************************************************************************************************************************************************************************/
+.el-menu-item[data-v-11e733ca] {
+  padding: 0 !important;
+}
 .nav-link[data-v-11e733ca] {
   display: inline-block;
   height: 60px;
   width: 80px !important;
   line-height: 60px;
-  padding: 0;
+  padding: 0 20px;
   text-align: center;
 }
