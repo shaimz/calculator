@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="62daa579-ba1a-411e-a02e-895311fe74b1" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/navbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/navbar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webpack.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -189,7 +189,7 @@
       <option name="presentableId" value="Default" />
       <updated>1627626484863</updated>
       <workItem from="1627626487125" duration="17226000" />
-      <workItem from="1627813693362" duration="2152000" />
+      <workItem from="1627813693362" duration="2202000" />
     </task>
     <task id="LOCAL-00001" summary="dev">
       <created>1627834866914</created>
@@ -198,28 +198,41 @@
       <option name="project" value="LOCAL" />
       <updated>1627834866914</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="dev">
+      <created>1627834925939</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1627834925939</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="2" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="dev" />
     <option name="LAST_COMMIT_MESSAGE" value="dev" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="585" y="19" key="CommitChangelistDialog2" timestamp="1627834865627">
+    <state x="585" y="19" key="CommitChangelistDialog2" timestamp="1627834925082">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="585" y="19" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1627834865627" />
+    <state x="585" y="19" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1627834925082" />
+    <state x="272" y="78" key="DiffContextDialog" timestamp="1627834922580">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="272" y="78" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1627834922580" />
     <state x="780" y="138" key="RollbackChangesDialog" timestamp="1627834837800">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="780" y="138" key="RollbackChangesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1627834837800" />
-    <state x="552" y="249" key="Vcs.Push.Dialog.v2" timestamp="1627834869107">
+    <state x="552" y="249" key="Vcs.Push.Dialog.v2" timestamp="1627834926468">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1627834869107" />
+    <state x="552" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1627834926468" />
   </component>
 </project>

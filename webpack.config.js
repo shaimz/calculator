@@ -16,10 +16,7 @@ module.exports = {
     plugins: [
         new UglifyJsPlugin(),
         new WebpackBundleAnalyzer(),
-        new VueLoaderPlugin(),
-        new MiniCssExtractPlugin({
-            filename: `components/[name].css`
-        }),
+        new VueLoaderPlugin()
     ],
     module: {
         rules: [
