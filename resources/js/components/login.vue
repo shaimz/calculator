@@ -64,7 +64,7 @@
                         .then(response => {
                             console.log(response.data)
                             if (response.data.success) {
-                                router.go('/calculator')
+                                router.push({name:'Calculator'})
                             } else {
                                 error.value = response.data.message
                             }
@@ -84,7 +84,7 @@
         },
         beforeRouteEnter(to, from, next) {
             if (window.Laravel.isLoggedin) {
-                return next('dashboard');
+                return next('/');
             }
             next();
         }

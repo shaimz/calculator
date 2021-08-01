@@ -7,17 +7,26 @@ import 'element-plus/lib/theme-chalk/index.css';
 const app = createApp({});
 
 window.$ = window.jQuery = require('jquery');
+window.axios = require('axios');
+window.axios.defaults.headers.common = {
+    'X-Requested-With': 'XMLHttpRequest',
+    'X-CSRF-TOKEN' : document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+};
 
 import master from './master.vue';
 
 import {
     ElMenu,
-    ElMenuItem
+    ElMenuItem,
+    ElTabPane,
+    ElTabs
 } from 'element-plus';
 
 const components = [
     ElMenuItem,
-    ElMenu
+    ElMenu,
+    ElTabPane,
+    ElTabs
 ];
 
 components.forEach(component => {

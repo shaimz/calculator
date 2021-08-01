@@ -1,14 +1,24 @@
 <template>
-    <h1>test</h1>
+    <el-tabs type="border-card" class="container">
+        <el-tab-pane label="Ingredients">
+            <ingredients></ingredients>
+        </el-tab-pane>
+        <el-tab-pane label="tobe"></el-tab-pane>
+        <el-tab-pane label="tobe"></el-tab-pane>
+        <el-tab-pane label="tobe"></el-tab-pane>
+    </el-tabs>
 </template>
 
 <script>
-    import {defineComponent,ref} from 'vue';
+    import {defineComponent, ref} from 'vue';
+    import ingredients from '../components/ingredients';
+
     export default defineComponent({
-        setup(){
+        components:{ingredients},
+        setup() {
             const name = ref('');
 
-            if(window.Laravel.user){
+            if (window.Laravel.user) {
                 name.value = window.Laravel.user.name
             }
         },

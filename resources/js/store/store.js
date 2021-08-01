@@ -1,15 +1,14 @@
-import { createStore } from 'vuex'
+import {createStore} from 'vuex'
 
 // Create a new store instance.
 export const store = createStore({
-    state () {
-        return {
-            count: 0
-        }
+    state: {
+        ingredients: []
     },
+    actions: {},
     mutations: {
-        increment (state) {
-            state.count++
+        GET_INGREDIENTS(state, payload = {}) {
+            axios.get('/api/ingredients', payload).then((r) => state.ingredients = r.data)
         }
     }
 })

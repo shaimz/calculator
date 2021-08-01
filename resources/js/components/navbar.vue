@@ -42,7 +42,6 @@
             const router = useRouter();
             const route = useRoute();
             const path = computed(() => route.fullPath);
-            const axios = inject('$axios');
             const isLoggedIn = ref(false);
 
             if (window.Laravel.isLoggedin) isLoggedIn.value = true

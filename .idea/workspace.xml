@@ -2,17 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="62daa579-ba1a-411e-a02e-895311fe74b1" name="Default Changelist" comment="dev">
+      <change afterPath="$PROJECT_DIR$/resources/js/components/ingredients.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/UserController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/RedirectIfAuthenticated.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/RedirectIfAuthenticated.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/babel.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/babel.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Kernel.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/components/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/components/main.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/resources_js_components_login_vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/resources_js_components_login_vue.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/resources_js_components_navbar_vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/resources_js_components_navbar_vue.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/vendor.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/vendor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/resources_js_views_Calculator_vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/resources_js_views_Calculator_vue.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/login.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/navbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/navbar.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/store/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/store.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/views/Calculator.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/views/Calculator.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -30,18 +34,6 @@
         <option value="Vue Single File Component" />
       </list>
     </option>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>{{--</find>
-      <find>elmenu</find>
-      <find>el</find>
-      <find>laravel</find>
-    </findStrings>
-    <dirStrings>
-      <dir>$PROJECT_DIR$/public</dir>
-      <dir>$PROJECT_DIR$</dir>
-    </dirStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -200,7 +192,7 @@
       <option name="presentableId" value="Default" />
       <updated>1627626484863</updated>
       <workItem from="1627626487125" duration="17226000" />
-      <workItem from="1627813693362" duration="4454000" />
+      <workItem from="1627813693362" duration="9418000" />
     </task>
     <task id="LOCAL-00001" summary="dev">
       <created>1627834866914</created>
@@ -258,7 +250,14 @@
       <option name="project" value="LOCAL" />
       <updated>1627835430479</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="dev">
+      <created>1627837225308</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1627837225308</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -271,10 +270,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="dev" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="585" y="19" key="CommitChangelistDialog2" timestamp="1627836208466">
+    <state x="585" y="19" key="CommitChangelistDialog2" timestamp="1627839023202">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="585" y="19" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1627836208466" />
+    <state x="585" y="19" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1627839023202" />
     <state x="272" y="78" key="DiffContextDialog" timestamp="1627834922580">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -283,9 +282,17 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="780" y="138" key="RollbackChangesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1627834837800" />
-    <state x="552" y="249" key="Vcs.Push.Dialog.v2" timestamp="1627835430965">
+    <state x="552" y="249" key="Vcs.Push.Dialog.v2" timestamp="1627837225894">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1627835430965" />
+    <state x="552" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1627837225894" />
+    <state x="668" y="237" width="597" height="566" key="find.popup" timestamp="1627839728568">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="668" y="237" width="597" height="566" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1627839728568" />
+    <state x="616" y="240" key="run.anything.popup" timestamp="1627838149987">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1627838149987" />
   </component>
 </project>
