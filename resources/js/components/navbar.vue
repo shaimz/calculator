@@ -50,7 +50,7 @@
             const logout = (e) => {
                 console.log('ss')
                 e.preventDefault()
-                axios.post('/api/logout')
+                axios.get('/api/logout')
                     .then(response => {
                         if (response.data.success) {
                             window.location.href = "/calculator"
@@ -102,7 +102,7 @@
                     return true;
                 }
                 let item = menu.value.find((e) => e.to === n.value);
-                activeIndex.value = item.index.toString()
+                activeIndex.value = item?.index.toString()
                 return true;
             },{immediate:true,deep:true})
 

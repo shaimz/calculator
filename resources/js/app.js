@@ -6,6 +6,7 @@ import 'element-plus/lib/theme-chalk/index.css';
 
 const app = createApp({});
 
+window.$ = window.jQuery = require('jquery');
 
 import master from './master.vue';
 

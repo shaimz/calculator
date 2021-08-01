@@ -67,10 +67,11 @@ class UserController extends Controller
     /**
      * Logout
      */
-    public function logout()
+    public function logout(Request $request)
     {
         try {
             Session::flush();
+            Auth::logout();
             $success = true;
             $message = 'Successfully logged out';
         } catch (\Illuminate\Database\QueryException $ex) {
