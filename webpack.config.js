@@ -65,7 +65,10 @@ module.exports = {
             },
             {
                 test: /\.vue$/,
-                loader: "vue-loader"
+                loader: "vue-loader",
+                options: {
+                    extractCSS: true
+                }
             },
             {
                 test: /\.(ttf|otf|eot|woff|woff2)$/,

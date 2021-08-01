@@ -1,10 +1,10 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
 function load(component) {
-    return () => import(/* webpackChunkName: "frontend-chunk-" */ /* webpackPreload: true */`../components/${component}.vue`)
+    return () => import(`../components/${component}.vue`)
 }
 function view(component) {
-    return () => import(/* webpackChunkName: "frontend-chunk-" */ /* webpackPreload: true */`./../views/${component}.vue`)
+    return () => import(`./../views/${component}.vue`)
 }
 
 const routes = [
