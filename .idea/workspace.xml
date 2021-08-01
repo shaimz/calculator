@@ -3,15 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="62daa579-ba1a-411e-a02e-895311fe74b1" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/components/frontend-chunk-1.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/components/resources_js_components_navbar_vue.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/frontend-chunk-0.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/frontend-chunk-1.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/frontend-chunk-2.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/resources_js_components_navbar_vue.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/router/router.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/router/router.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webpack.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/js/components/resources_js_components_navbar_vue.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/components/resources_js_components_navbar_vue.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/navbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/navbar.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -197,7 +190,7 @@
       <option name="presentableId" value="Default" />
       <updated>1627626484863</updated>
       <workItem from="1627626487125" duration="17226000" />
-      <workItem from="1627813693362" duration="2627000" />
+      <workItem from="1627813693362" duration="2677000" />
     </task>
     <task id="LOCAL-00001" summary="dev">
       <created>1627834866914</created>
@@ -234,7 +227,21 @@
       <option name="project" value="LOCAL" />
       <updated>1627835080099</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="dev">
+      <created>1627835380899</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1627835380899</updated>
+    </task>
+    <task id="LOCAL-00007" summary="dev">
+      <created>1627835392062</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1627835392062</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -247,10 +254,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="dev" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="585" y="19" key="CommitChangelistDialog2" timestamp="1627835079020">
+    <state x="585" y="19" key="CommitChangelistDialog2" timestamp="1627835391424">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="585" y="19" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1627835079020" />
+    <state x="585" y="19" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1627835391424" />
     <state x="272" y="78" key="DiffContextDialog" timestamp="1627834922580">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -259,9 +266,9 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="780" y="138" key="RollbackChangesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1627834837800" />
-    <state x="552" y="249" key="Vcs.Push.Dialog.v2" timestamp="1627835080627">
+    <state x="552" y="249" key="Vcs.Push.Dialog.v2" timestamp="1627835393674">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1627835080627" />
+    <state x="552" y="249" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1627835393674" />
   </component>
 </project>

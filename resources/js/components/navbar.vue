@@ -130,5 +130,6 @@
         line-height: 60px;
         padding: 0 20px;
         text-align: center;
+        box-sizing: content-box;
     }
 </style>
