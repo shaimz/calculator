@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\UserController;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -15,9 +16,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/api/login', [UserController::class, 'login']);
-Route::post('/api/register', [UserController::class, 'register']);
-Route::get('/api/logout', [UserController::class, 'logout'])->middleware('auth');
+Route::prefix('api')->group(function(){
+    Route::post('login', [UserController::class, 'login']);
+    Route::post('register', [UserController::class, 'register']);
+    Route::get('logout', [UserController::class, 'logout'])->middleware('auth');
+
+});
+
 
 Route::get('{any}', function () {
     return view('app');

@@ -13,8 +13,8 @@ export const store = createStore({
         async setIngredient(context, payload){
             await axios.post('/api/ingredient', payload).then((r) => context.commit('ADD_INGREDIENT', r.data))
         },
-        getCategories(context, payload){
-            axios.get('/api/category', payload).then((r) => context.commit('GET_CATEGORIES', r.data))
+        async getCategories(context, payload){
+            await axios.get('/api/category', payload).then((r) => context.commit('GET_CATEGORIES', r.data))
         },
         async setCategory(context, payload){
             await axios.post('/api/category', payload).then((r) => context.commit('ADD_CATEGORY', r.data))

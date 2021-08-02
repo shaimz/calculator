@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\m;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -13,9 +13,9 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        return response()->json(Category::all());
     }
 
     /**
@@ -36,16 +36,24 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|max:255'
+        ]);
+
+        $category = new Category();
+        $category->name = $request->name;
+        $category->save();
+
+        return response()->json($category->id);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\m  $m
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(m $m)
+    public function show($id)
     {
         //
     }
@@ -53,10 +61,10 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\m  $m
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(m $m)
+    public function edit($id)
     {
         //
     }
@@ -65,10 +73,10 @@ class CategoryController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\m  $m
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, m $m)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -76,10 +84,10 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\m  $m
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(m $m)
+    public function destroy($id)
     {
         //
     }

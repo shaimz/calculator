@@ -42,23 +42,25 @@
 </template>
 
 <script>
-    import {defineComponent, ref, reactive, computed} from 'vue';
+    import {defineComponent, ref, reactive, computed, toRefs} from 'vue';
+    import {useStore} from 'vuex';
 
     export default defineComponent({
-        props: ['rows','model','itemId'],
+        props: ['rows','model','itemId','add','get'],
         emits:['category'],
         setup(props, context) {
+            const store = useStore();
             const itemId = props.itemId;
-            const propRows = props.rows;
-            const rows = reactive(propRows);
-            const datas = reactive([...rows]);
+            const propRows = toRefs(props).rows;
+            const datas = reactive(propRows.value);
             const model = reactive({...props.model});
             const addRow = () => {
                 datas.push({...model})
             };
             const add = (index) => {
-                datas[index].created = true;
-                store.dispatch('setCategory',datas[index])
+                store.dispatch(props.add,datas[index]).then(() => {
+                    store.dispatch(props.get);
+                });
             };
             const handleDelete = (index) => {
                 datas.splice(index, 1);
@@ -76,7 +78,6 @@
 
             return {
                 datas,
-                rows,
                 itemId,
                 addRow,
                 handleDelete,
