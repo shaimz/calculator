@@ -19,14 +19,22 @@ import {
     ElMenu,
     ElMenuItem,
     ElTabPane,
-    ElTabs
+    ElTabs,
+    ElTable,
+    ElTableColumn,
+    ElButton,
+    ElInput,
 } from 'element-plus';
 
 const components = [
     ElMenuItem,
     ElMenu,
     ElTabPane,
-    ElTabs
+    ElTabs,
+    ElTable,
+    ElTableColumn,
+    ElButton,
+    ElInput
 ];
 
 components.forEach(component => {
