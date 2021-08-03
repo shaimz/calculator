@@ -9,7 +9,7 @@
         <el-table-column label="Name" width="250" v-if="checkProperty('name')">
             <template #default="scope">
                 <el-input v-model="scope.row.name" type="text" :readonly="!scope.row.edited"></el-input>
-                <span v-else>{{scope.row.name}}</span>
+                <span>{{scope.row.name}}</span>
             </template>
         </el-table-column>
 
@@ -23,21 +23,21 @@
                         :value="item.value">
                     </el-option>
                 </el-select>
-                <span v-else>{{scope.row.measure}}</span>
+                <span>{{scope.row.measure}}</span>
             </template>
         </el-table-column>
 
         <el-table-column label="Price" width="100" v-if="checkProperty('price')">
             <template #default="scope">
                 <el-input v-model="scope.row.price" :readonly="!scope.row.edited" type="number"></el-input>
-                <span v-else>{{scope.row.price}}</span>
+                <span>{{scope.row.price}}</span>
             </template>
         </el-table-column>
 
         <el-table-column label="Price p/portion" width="150" v-if="checkProperty('price_portion')">
             <template #default="scope">
                 <el-input v-model="scope.row.price_portion" type="number" v-if="!scope.row.created"></el-input>
-                <span v-else>{{scope.row.price_portion}}</span>
+                <span>{{scope.row.price_portion}}</span>
             </template>
         </el-table-column>
 

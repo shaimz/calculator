@@ -2,26 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="62daa579-ba1a-411e-a02e-895311fe74b1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/IngredientController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/IngredientController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Ingredient.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Ingredient.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2021_08_02_125048_create_categories_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_08_02_125048_create_categories_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/resources_js_components_ingredients_vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/resources_js_components_ingredients_vue.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/resources_js_views_Calculator_vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/resources_js_views_Calculator_vue.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/vendor.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/vendor.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/dataTable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/dataTable.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/ingredients.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ingredients.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/store/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/store/store.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/views/Calculator.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/views/Calculator.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/sass/app.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/app.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webpack.mix.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.mix.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/public/js/" />
     <ignored path="$PROJECT_DIR$/vendor/beyondcode/laravel-dump-server/" />
@@ -199,8 +180,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/resources/js/components/dataTable.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="10" column="92" selection-start-line="10" selection-start-column="92" selection-end-line="10" selection-end-column="92" />
+            <state relative-caret-position="209">
+              <caret line="11" column="21" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="21" />
               <folding>
                 <element signature="n#style#0;n#el-table#0;n#template#0;n#!!top" expanded="true" />
                 <element signature="e#2148#2217#0" expanded="true" />
@@ -218,15 +199,6 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/resources/sass/app.scss">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="13" selection-start-line="13" selection-end-line="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -240,8 +212,8 @@
     <findStrings>
       <find>proprows</find>
       <find>dispatch(</find>
-      <find>console.log</find>
       <find>console.lo</find>
+      <find>console.log</find>
     </findStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/resources/js</dir>
@@ -475,6 +447,19 @@
             <path>
               <item name="calculator.test" type="b2602c69:ProjectViewProjectNode" />
               <item name="calculator.test" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="calculator.test" type="b2602c69:ProjectViewProjectNode" />
+              <item name="calculator.test" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+              <item name="js" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="calculator.test" type="b2602c69:ProjectViewProjectNode" />
+              <item name="calculator.test" type="462c0819:PsiDirectoryNode" />
               <item name="resources" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -556,7 +541,7 @@
       <workItem from="1627626487125" duration="17226000" />
       <workItem from="1627813693362" duration="9418000" />
       <workItem from="1627907975015" duration="6979000" />
-      <workItem from="1627971924680" duration="21310000" />
+      <workItem from="1627971924680" duration="21498000" />
     </task>
     <task id="LOCAL-00001" summary="dev">
       <created>1627834866914</created>
@@ -642,11 +627,25 @@
       <option name="project" value="LOCAL" />
       <updated>1627916464993</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="dev">
+      <created>1628004619097</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1628004619097</updated>
+    </task>
+    <task id="LOCAL-00014" summary="dev">
+      <created>1628004640249</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1628004640249</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="42215000" />
+    <option name="totallyTimeSpent" value="42403000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1920" height="977" extended-state="0" />
@@ -924,10 +923,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/public/js/components/main.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10296" column="1166" selection-start-line="10296" selection-start-column="1166" selection-end-line="10296" selection-end-column="1166" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/resources/js/components/dataTable.vue">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="10" column="92" selection-start-line="10" selection-start-column="92" selection-end-line="10" selection-end-column="92" />
+        <state relative-caret-position="209">
+          <caret line="11" column="21" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="21" />
           <folding>
             <element signature="n#style#0;n#el-table#0;n#template#0;n#!!top" expanded="true" />
             <element signature="e#2148#2217#0" expanded="true" />
