@@ -6,3 +6,8 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+
+.active-row-first{
+    background-color:var(--el-table-current-row-background-color) !important;
+}

@@ -1,10 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Ingredient extends Model
 {
     protected $table = 'ingredient';
+    public $timestamps = false;
 }

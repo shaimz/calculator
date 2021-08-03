@@ -6,7 +6,6 @@ use Api\CategoryController;
 use Api\IngredientController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,9 +21,6 @@ use App\Http\Controllers\Api\UserController;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::post('/api/login', [UserController::class, 'login']);
-Route::post('/api/register', [UserController::class, 'register']);
-Route::get('/api/logout', [UserController::class, 'logout'])->middleware('auth:api');
 
 Route::resource('category',CategoryController::class);
 Route::resource('ingredient',IngredientController::class);

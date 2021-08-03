@@ -24,6 +24,8 @@ import {
     ElTableColumn,
     ElButton,
     ElInput,
+    ElSelect,
+    ElOption
 } from 'element-plus';
 
 const components = [
@@ -34,7 +36,9 @@ const components = [
     ElTable,
     ElTableColumn,
     ElButton,
-    ElInput
+    ElInput,
+    ElSelect,
+    ElOption
 ];
 
 components.forEach(component => {

@@ -10942,3 +10942,7 @@ a.text-dark:focus {
   }
 }
 
+.active-row-first {
+  background-color: var(--el-table-current-row-background-color) !important;
+}
+

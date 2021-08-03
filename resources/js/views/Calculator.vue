@@ -1,7 +1,7 @@
 <template class="p-4">
     <el-tabs type="border-card" class="container-fluid border-dark">
         <el-tab-pane label="Ingredients" class="d-flex">
-            <ingredients class="d-flex"></ingredients>
+            <ingredients></ingredients>
         </el-tab-pane>
         <el-tab-pane label="tobe"></el-tab-pane>
         <el-tab-pane label="tobe"></el-tab-pane>

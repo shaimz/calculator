@@ -7,8 +7,8 @@ export const store = createStore({
         categories: []
     },
     actions: {
-        getIngredients(context, payload){
-            axios.get('/api/ingredient', payload).then((r) => context.commit('GET_INGREDIENTS', r.data))
+        async getIngredients(context, payload = 0){
+            await axios.get('/api/ingredient/' + payload.category_id).then((r) => context.commit('GET_INGREDIENTS', r.data))
         },
         async setIngredient(context, payload){
             await axios.post('/api/ingredient', payload).then((r) => context.commit('ADD_INGREDIENT', r.data))
@@ -38,7 +38,7 @@ export const store = createStore({
             let exists = state.ingredients.find((i) => i.name === data.name);
 
             if (!exists) {
-                state.categories.push({...data});
+                state.ingredients.push({...data});
             }
         }
     }
