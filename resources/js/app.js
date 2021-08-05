@@ -45,6 +45,13 @@ components.forEach(component => {
     app.component(component.name, component)
 });
 
+import {ElLoading} from 'element-plus';
+app.use(ElLoading);
+
+import vClickOutside from "click-outside-vue3"
+
+app.use(vClickOutside);
+
 app.use(router);
 app.use(store);
 app.component('master',master);

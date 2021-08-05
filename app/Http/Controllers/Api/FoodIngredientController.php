@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Ingredient;
+use App\Models\FoodIngredient;
 use Illuminate\Http\Request;
 
-class IngredientController extends Controller
+class FoodIngredientController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,9 +14,10 @@ class IngredientController extends Controller
      * @param $category_id
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-
+        $group_id = $request->group_id;
+        return response()->json(FoodIngredient::where('food_id',$group_id)->get());
     }
 
     /**
@@ -41,14 +42,14 @@ class IngredientController extends Controller
             'name' => 'required|max:255'
         ]);
 
-        $ingredient = new Ingredient();
-        $ingredient->name = $request->name;
-        $ingredient->category_id = $request->category_id;
-        $ingredient->price = $request->price;
-        $ingredient->measure = $request->measure;
-        $ingredient->save();
+        $food = new FoodIngredient();
+        $food->name = $request->name;
+        $food->group_id = $request->group_id;
+        $food->portions = $request->portions;
+        $food->price_portion = $request->price_portion;
+        $food->save();
 
-        return response()->json($ingredient->id);
+        return response()->json($food->id);
     }
 
     /**
@@ -59,7 +60,7 @@ class IngredientController extends Controller
      */
     public function show($id)
     {
-        return response()->json(Ingredient::where('category_id',$id)->get());
+        return response()->json(FoodIngredient::where('food_id',$id)->get());
     }
 
     /**
@@ -82,11 +83,11 @@ class IngredientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $ingredient = Ingredient::find($id);
-        $ingredient->name = $request->name ?? '';
-        $ingredient->measure = $request->measure ?? 'kg';
-        $ingredient->price = $request->price ?? 0;
-        $ingredient->save();
+        $food = FoodIngredient::find($id);
+        $food->name = $request->name ?? '';
+        $food->portions = $request->portions ?? 0;
+        $food->price_portion = $request->price_portion ?? 0;
+        $food->save();
 
         return response()->json();
     }

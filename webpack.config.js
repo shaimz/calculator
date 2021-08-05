@@ -6,9 +6,9 @@ const path = require("path");
 
 module.exports = {
     mode: 'development',
-    entry: {
-        main: "./resources/js/app.js",
-    },
+    entry: [
+        "./resources/js/app.js","./resources/sass/app.scss"
+    ],
     output: {
         publicPath: '/js/',
         path: path.resolve(__dirname, "public/js"),

@@ -11,3 +11,17 @@
 .active-row-first{
     background-color:var(--el-table-current-row-background-color) !important;
 }
+.el-tab-pane[role=tabpanel]{
+    display: flex;
+}
+.el-table__row .cell > span{
+    display: block;
+    width: 100%;
+    padding:12px 0;
+}
+
+.el-table__row{
+    & > td{
+        padding: 0 !important;
+    }
+}

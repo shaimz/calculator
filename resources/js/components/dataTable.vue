@@ -1,21 +1,21 @@
 <template>
     <el-button type="success" @click="addRow()" round>Adding row</el-button>
-    <el-table :key="datas" :data="datas" :row-class-name="cellClass" border height="350" style="width:100%;margin-top: 15px;" current-row-key="40" @current-change="handleChange" highlight-current-row>
+    <el-table :key="datas" :data="datas" :row-class-name="cellClass" :lazy="true" v-loading="load" border height="350" style="width:100%;margin-top: 15px;" current-row-key="40" @row-click="handleChange" highlight-current-row>
         <el-table-column labell="" width="50px" v-if="checkProperty('type')">
-            <template #default="scope" v-if="datas[0].type === 'category'">
+            <template #default="scope" v-if="['category','group'].includes(datas[0].type)">
                 <span v-if="scope.row.id === itemId" class="rounded-circle bg-success active m-auto"></span>
             </template>
         </el-table-column>
         <el-table-column label="Name" width="250" v-if="checkProperty('name')">
             <template #default="scope">
-                <el-input v-model="scope.row.name" type="text" :readonly="!scope.row.edited"></el-input>
-                <span>{{scope.row.name}}</span>
+                <el-input v-model="scope.row.name" type="text" @click="stopPropagation($event)" v-if="checkProperty('edited',scope.$index)"></el-input>
+                <span v-else>{{scope.row.name}}</span>
             </template>
         </el-table-column>
 
         <el-table-column label="Portions" width="100" v-if="checkProperty('measure')">
             <template #default="scope">
-                <el-select v-model="scope.row.measure" placeholder="Select" :readonly="!scope.row.edited">
+                <el-select v-model="scope.row.measure" @click="stopPropagation($event)" placeholder="Select" v-if="checkProperty('edited',scope.$index)">
                     <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -23,42 +23,53 @@
                         :value="item.value">
                     </el-option>
                 </el-select>
-                <span>{{scope.row.measure}}</span>
+                <span v-else>{{scope.row.measure}}</span>
+            </template>
+        </el-table-column>
+
+        <el-table-column label="Portions" width="100" v-if="checkProperty('portions')">
+            <template #default="scope">
+                <el-input v-model="scope.row.portions" @click="stopPropagation($event)" v-if="checkProperty('edited',scope.$index)" type="number"></el-input>
+                <span v-else>{{scope.row.portions}}</span>
             </template>
         </el-table-column>
 
         <el-table-column label="Price" width="100" v-if="checkProperty('price')">
             <template #default="scope">
-                <el-input v-model="scope.row.price" :readonly="!scope.row.edited" type="number"></el-input>
-                <span>{{scope.row.price}}</span>
+                <el-input v-model="scope.row.price" @click="stopPropagation($event)" v-if="checkProperty('edited',scope.$index)" type="number"></el-input>
+                <span v-else>{{scope.row.price}}</span>
             </template>
         </el-table-column>
 
         <el-table-column label="Price p/portion" width="150" v-if="checkProperty('price_portion')">
             <template #default="scope">
-                <el-input v-model="scope.row.price_portion" type="number" v-if="!scope.row.created"></el-input>
-                <span>{{scope.row.price_portion}}</span>
+                <el-input v-model="scope.row.price_portion" @click="stopPropagation($event)" type="number" v-if="checkProperty('edited',scope.$index)"></el-input>
+                <span v-else>{{scope.row.price_portion}}</span>
             </template>
         </el-table-column>
 
-        <el-table-column label="" width="150">
+        <el-table-column label="" width="200">
             <template #default="scope">
-                <el-button v-if="!checkProperty('created',scope.$index)" size="mini" type="success" @click="add(scope.$index)">Add</el-button>
-                <el-button v-if="checkProperty('created',scope.$index)" size="mini" type="danger" @click="handleDelete(scope.$index)">Delete</el-button>
+                <el-button data-id="add" v-if="!checkProperty('created',scope.$index)" size="mini" type="success" @click="add(scope.$index)">Add</el-button>
+                <el-button data-id="edit" v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index)" size="mini" type="primary" @click="setEdit($event,scope.$index)">Edit</el-button>
+                <el-button data-id="update" v-if="checkProperty('edited',scope.$index) && checkProperty('created',scope.$index)" size="mini" type="success" @click="update(scope.$index)">Save</el-button>
+                <el-button data-id="delete" v-if="checkProperty('created',scope.$index)" size="mini" type="danger" @click="handleDelete(scope.$index)">Delete</el-button>
             </template>
         </el-table-column>
     </el-table>
 </template>
 
 <script>
-    import {defineComponent, ref, reactive, computed, toRefs, onMounted} from 'vue';
+    import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted} from 'vue';
     import {useStore} from 'vuex';
 
     export default defineComponent({
-        props: ['rows','model','itemId','add','get'],
+        props: ['rows','model','itemId','add','get','update','loading'],
         emits:['category'],
         setup(props, context) {
             const store = useStore();
+            const prop = toRefs(props);
+            const load = prop.loading;
             const options = [
                 {
                     value:'kg',
@@ -81,6 +92,12 @@
                     label:'Ml'
                 }
             ];
+            const loading =  computed({
+                get:() => load.value,
+                set:(v) => {
+                    context.emit('loading', v)
+                }
+            });
             const itemId = computed(() => props.itemId);
             const datas = ref([...props.rows]);
             const model = reactive({...props.model});
@@ -89,35 +106,98 @@
             };
             const add = (index) => {
                 let data = {...datas.value[index]};
+                let type = '';
 
-                if(props.add === "setIngredient"){
-                    data.category_id = itemId.value;
+                switch(props.add){
+                    case 'setIngredient':
+                        data.category_id = itemId.value;
+                        type = 'category_id';
+                        break;
+
+                    case 'setFood':
+                        data.group_id = itemId.value;
+                        type = 'group_id';
+                        break;
                 }
+
                 if(data.name){
                     store.dispatch(props.add,data).then(() => {
-                        store.dispatch(props.get,{category_id:itemId.value});
+                        let params = {};
+                        params[type] = itemId.value;
+                        props.rows.map((item) => {
+                            if(!item.hasOwnProperty('created')){
+                                item.created = true;
+                                delete item.edited;
+                                return item;
+                            }
+                        })
+                        loading.value = true;
+                        store.dispatch(props.get,params).then(() => loading.value = false);
                     });
                 }
+            };
+            const update = (index) => {
+                let data = {...datas.value[index]};
+                let type = '';
+
+                switch(props.add){
+                    case 'setIngredient':
+                        data.category_id = itemId.value;
+                        type = 'category_id';
+                        break;
+
+                    case 'setFood':
+                        data.group_id = itemId.value;
+                        type = 'group_id';
+                        break;
+                }
+
+                if(data.name){
+                    store.dispatch(props.update,data).then(() => {
+                        let params = {};
+                        params[type] = itemId.value;
+
+                        loading.value = true;
+                        store.dispatch(props.get,params).then(() => {
+                            loading.value = false;
+                            delete datas.value[index].edited;
+                        });
+                    });
+                }
+            };
+            const setEdit = (e,index) => {
+                setTimeout(() => {
+                    datas.value[index].edited = false;
+                },200)
+
+            };
+            const stopPropagation = (e) => {
+                e.stopImmediatePropagation();
             };
             const handleDelete = (index) => {
                 datas.value.splice(index, 1);
             };
-            const handleChange = (val,o) => {
-                if(typeof val.id !== "undefined"){
-                    context.emit('category',val.id);
+            const handleChange = (row, column, event) => {
+                if(typeof row.id !== "undefined"){
+                    context.emit('category',row.id);
+                    datas.value.map((item,i) => delete datas.value[i].edited);
                     return 'active-row';
                 }
             };
 
             const cellClass = (row) => {
-                if(row.row.id === datas.value[0].id && row.row.id === itemId.value && row.row.type === 'category'){
+                if(row.row.id === datas.value[0].id && row.row.id === itemId.value && ['group','category'].includes(row.row.type)){
                     return 'active-row-first';
                 }
             }
 
             const checkProperty = (property,index = 0) => {
                 if(typeof datas.value[index] !== "undefined") return datas.value[index].hasOwnProperty(property);
-                else return false;
+                return false;
+            };
+
+            const saveAway = (event,index) => {
+                if(checkProperty('edited',index)) return edit(index)
             };
 
 
@@ -125,12 +205,18 @@
                 datas,
                 options,
                 itemId,
+                loading,
+                load,
                 addRow,
                 handleDelete,
                 checkProperty,
                 add,
+                update,
                 handleChange,
-                cellClass
+                cellClass,
+                setEdit,
+                stopPropagation,
+                saveAway
             }
         }
     })

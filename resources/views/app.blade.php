@@ -15,7 +15,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('js/components/main.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    {{--<link href="{{ asset('css/app.css') }}" rel="stylesheet">--}}
 </head>
 <body>
 @if (Auth::check())
