@@ -8,4 +8,8 @@ class Category extends Model
 {
     protected $table = 'category';
     public $timestamps = false;
+
+    public function ingredients(){
+        $this->hasMany(Ingredient::class,'category_id','id');
+    }
 }

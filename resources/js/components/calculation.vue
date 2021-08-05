@@ -12,16 +12,19 @@
     <div id="ingredients">
         <h2>Food and Ingredients</h2>
         <div id="food-list" v-if="groupRows[0].created">
-            <dataTable @loading="setLoading" :loading="loading" :key="foodRows" :get="'getFoods'" :add="'setFood'" :update="'updateFood'"
+            <dataTable @modal="toggleModal" @loading="setLoading" :loading="loading" :key="foodRows" :get="'getFoods'" :add="'setFood'" :update="'updateFood'"
                        :item-id="group"
+                       :food="food"
                        :model="modelFoods"
                        :rows="foodRows">
             </dataTable>
 
-            <dataTable @loading="setLoading" :loading="loading" :key="foodRows" :get="'getFoods'" :add="'setFood'" :update="'updateFood'"
+            <modal @modal="toggleModal" :food="food" :data="modalFoods" :group="group" :dialog="modal"></modal>
+
+            <dataTable id="food-ingredient-list" v-if="food_ingredientRows[0].created" @loading="setLoading" :loading="loading" :key="food_ingredientRows" :get="'getFoodIngredients'" :add="'setFoodIngredient'" :update="'updateFoodIngredient'"
                        :item-id="group"
-                       :model="modelFoods"
-                       :rows="foodRows">
+                       :model="modelFoodIngredients"
+                       :rows="food_ingredientRows">
             </dataTable>
         </div>
     </div>
@@ -31,14 +34,16 @@
     import {defineComponent, ref, computed, watch, onMounted} from 'vue';
     import {useStore} from 'vuex';
     import dataTable from '../components/dataTable.vue';
+    import modal from '../components/modal.vue';
 
     export default defineComponent({
         components: {
-            dataTable
+            dataTable,
+            modal
         },
         setup() {
             const store = useStore();
-
+            const modal = ref(false);
             const loading = ref(false);
 
             //Groups
@@ -79,16 +84,16 @@
 
             //Foods
             const foods = computed(() => store.state.foods);
+            const modalFoods = foods.value.map((item) => {return {key:item.id,label:item.name}});
             let modelFoods = ref({name: '', portions: 0, price_portion: 0, type: 'food', edited: false});
             let foodRows = ref([{...modelFoods.value}]);
-            const food = ref(typeof food_ingredients.value[0] !== 'undefined' ? food_ingredients.value[0].id : null);
+            const food = ref(typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null);
 
             const fetchFoods = (group_id) => {
                 loading.value = true;
                 store.dispatch('getFoods', {group_id: group_id}).then(() => {
                     loading.value = false;
                     if (foods.value.length) {
-                        console.log(foods.value.length);
                         foodRows.value = foods.value.map((item) => {
                             return {
                                 id: typeof item.id !== 'undefined' ? item.id : null,
@@ -168,6 +173,9 @@
                 loading.value = v;
             };
 
+            const toggleModal = (v) => {
+                modal.value = v
+            }
             return {
                 foods,
                 groups,
@@ -177,8 +185,14 @@
                 modelGroups,
                 setGroup,
                 group,
+                food,
+                modelFoodIngredients,
+                food_ingredientRows,
                 loading,
-                setLoading
+                setLoading,
+                modal,
+                modalFoods,
+                toggleModal
             }
         }
     })

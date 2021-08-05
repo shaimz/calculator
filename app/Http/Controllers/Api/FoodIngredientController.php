@@ -16,8 +16,8 @@ class FoodIngredientController extends Controller
      */
     public function index(Request $request)
     {
-        $group_id = $request->group_id;
-        return response()->json(FoodIngredient::where('food_id',$group_id)->get());
+        $food_id = $request->food_id;
+        return response()->json(FoodIngredient::where('food_id',$food_id)->get());
     }
 
     /**
@@ -42,14 +42,14 @@ class FoodIngredientController extends Controller
             'name' => 'required|max:255'
         ]);
 
-        $food = new FoodIngredient();
-        $food->name = $request->name;
-        $food->group_id = $request->group_id;
-        $food->portions = $request->portions;
-        $food->price_portion = $request->price_portion;
-        $food->save();
+        $foodI = new FoodIngredient();
+        $foodI->name = $request->name;
+        $foodI->food_id = $request->food_id;
+        $foodI->portions = $request->portions;
+        $foodI->price_portion = $request->price_portion;
+        $foodI->save();
 
-        return response()->json($food->id);
+        return response()->json($foodI->id);
     }
 
     /**
@@ -83,11 +83,11 @@ class FoodIngredientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $food = FoodIngredient::find($id);
-        $food->name = $request->name ?? '';
-        $food->portions = $request->portions ?? 0;
-        $food->price_portion = $request->price_portion ?? 0;
-        $food->save();
+        $foodI = FoodIngredient::find($id);
+        $foodI->name = $request->name ?? '';
+        $foodI->portions = $request->portions ?? 0;
+        $foodI->price_portion = $request->price_portion ?? 0;
+        $foodI->save();
 
         return response()->json();
     }

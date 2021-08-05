@@ -47,13 +47,13 @@ export const store = createStore({
             await axios.put('/api/food/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD', r.data))
         },
         async getFoodIngredients(context, payload = 0){
-            await axios.get('/api/food-ingredient/' + payload.group_id).then((r) => context.commit('GET_FOODS', r.data))
+            await axios.get('/api/food-ingredient/' + payload.group_id).then((r) => context.commit('GET_FOOD_INGREDIENTS', r.data))
         },
         async setFoodIngredient(context, payload){
-            await axios.post('/api/food-ingredient', payload).then((r) => context.commit('ADD_FOOD', r.data))
+            await axios.post('/api/food-ingredient', payload).then((r) => context.commit('ADD_FOOD_INGREDIENT', r.data))
         },
         async updateFoodIngredient(context, payload){
-            await axios.put('/api/food-ingredient/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD', r.data))
+            await axios.put('/api/food-ingredient/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD_INGREDIENT', r.data))
         },
     },
     mutations: {
@@ -124,6 +124,25 @@ export const store = createStore({
         },
         EDIT_FOOD(state,data){
             state.foods.map((item) => {
+                if(item.id === data.id){
+                    return data;
+                }
+            })
+        },
+        GET_FOOD_INGREDIENTS(state, data) {
+            state.food_ingredients = data;
+        },
+        ADD_FOOD_INGREDIENT(state, data){
+            let exists = state.food_ingredients.find((i) => i.name === data.name);
+
+            if (!exists) {
+                let result = {...data};
+                result.created = true;
+                state.food_ingredients.push({...data});
+            }
+        },
+        EDIT_FOOD_INGREDIENT(state,data){
+            state.food_ingredients.map((item) => {
                 if(item.id === data.id){
                     return data;
                 }

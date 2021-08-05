@@ -50,6 +50,7 @@
 
         <el-table-column label="" width="200">
             <template #default="scope">
+                <el-button data-id="add" v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index) && props.get === 'getFoods'" size="mini" type="success" icon="el-icon-check" circle @click="addItems()"></el-button>
                 <el-button data-id="add" v-if="!checkProperty('created',scope.$index)" size="mini" type="success" @click="add(scope.$index)">Add</el-button>
                 <el-button data-id="edit" v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index)" size="mini" type="primary" @click="setEdit($event,scope.$index)">Edit</el-button>
                 <el-button data-id="update" v-if="checkProperty('edited',scope.$index) && checkProperty('created',scope.$index)" size="mini" type="success" @click="update(scope.$index)">Save</el-button>
@@ -64,8 +65,8 @@
     import {useStore} from 'vuex';
 
     export default defineComponent({
-        props: ['rows','model','itemId','add','get','update','loading'],
-        emits:['category'],
+        props: ['rows','model','itemId','add','get','update','loading','food'],
+        emits:['category','modal'],
         setup(props, context) {
             const store = useStore();
             const prop = toRefs(props);
@@ -185,8 +186,9 @@
                 }
             };
 
+            const foodId = computed(() => props.food);
             const cellClass = (row) => {
-                if(row.row.id === datas.value[0].id && row.row.id === itemId.value && ['group','category'].includes(row.row.type)){
+                if(row.row.id === datas.value[0].id && (row.row.id === itemId.value || row.row.id === foodId.value) && ['group','category','food'].includes(row.row.type)){
                     return 'active-row-first';
                 }
             }
@@ -196,9 +198,9 @@
                 return false;
             };
 
-            const saveAway = (event,index) => {
-                if(checkProperty('edited',index)) return edit(index)
-            };
+            const addItems = () => {
+                context.emit('modal',true)
+            }
 
 
             return {
@@ -207,6 +209,7 @@
                 itemId,
                 loading,
                 load,
+                props,
                 addRow,
                 handleDelete,
                 checkProperty,
@@ -216,7 +219,7 @@
                 cellClass,
                 setEdit,
                 stopPropagation,
-                saveAway
+                addItems
             }
         }
     })
