@@ -47,13 +47,16 @@ export const store = createStore({
             await axios.put('/api/food/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD', r.data))
         },
         async getFoodIngredients(context, payload = 0){
-            await axios.get('/api/food-ingredient/' + payload.group_id).then((r) => context.commit('GET_FOOD_INGREDIENTS', r.data))
+            await axios.get('/api/food-ingredient/' + payload.food_id).then((r) => context.commit('GET_FOOD_INGREDIENTS', r.data))
         },
         async setFoodIngredient(context, payload){
             await axios.post('/api/food-ingredient', payload).then((r) => context.commit('ADD_FOOD_INGREDIENT', r.data))
         },
         async updateFoodIngredient(context, payload){
-            await axios.put('/api/food-ingredient/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD_INGREDIENT', r.data))
+            await axios.put('/api/food-ingredient/'+payload.food_id, payload).then((r) => context.commit('EDIT_FOOD_INGREDIENT', r.data))
+        },
+        async deleteFoodIngredient(context, payload){
+            await axios.post('/api/food-ingredient/'+payload.food_id, payload).then((r) => context.commit('EDIT_FOOD_INGREDIENT', r.data))
         },
     },
     mutations: {

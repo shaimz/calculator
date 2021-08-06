@@ -7,7 +7,6 @@
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
 
-
 .active-row-first{
     background-color:var(--el-table-current-row-background-color) !important;
 }
@@ -24,4 +23,29 @@
     & > td{
         padding: 0 !important;
     }
+}
+.el-transfer-panel{
+    width:100% !important;
+    .el-transfer-panel__body{
+        label span.el-checkbox__label{
+            max-width: 270px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
+    }
+}
+.el-transfer__buttons{
+    max-width: 280px;
+    width: 100%;
+    text-align: center;
+    & .el-button:not(.is-disabled):nth-last-child(2){
+        background: #F56C6C;
+    }
+    & .el-button:not(.is-disabled):nth-last-child(1){
+        background: #85CE61;
+    }
+}
+.el-button.el-button--success[data-id=add_i]{
+    padding: 10px;
 }

@@ -10,6 +10,6 @@ class Category extends Model
     public $timestamps = false;
 
     public function ingredients(){
-        $this->hasMany(Ingredient::class,'category_id','id');
+        return $this->hasMany(Ingredient::class,'category_id','id');
     }
 }

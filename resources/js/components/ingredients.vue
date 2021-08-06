@@ -77,25 +77,27 @@
             let ingredientRows = ref([modelIngredients.value]);
 
             const fetchIngredients = (category_id) => {
-                loading.value = true;
-                store.dispatch('getIngredients', {category_id: category_id}).then(() => {
-                    loading.value = false;
-                    if (ingredients.value.length) {
-                        ingredientRows.value = ingredients.value.map((item) => {
-                            return {
-                                id: typeof item.id !== 'undefined' ? item.id : null,
-                                name: typeof item.name !== 'undefined' ? item.name : '',
-                                category_id: typeof item.category_id !== 'undefined' ? item.category_id : null,
-                                price: typeof item.price !== 'undefined' ? item.price : 0,
-                                measure: typeof item.measure !== 'undefined' ? item.measure : 'Kg',
-                                type: 'ingredient',
-                                created: true
-                            }
-                        })
-                    } else {
-                        ingredientRows.value = [modelIngredients.value];
-                    }
-                });
+                if(category_id){
+                    loading.value = true;
+                    store.dispatch('getIngredients', {category_id: category_id}).then(() => {
+                        loading.value = false;
+                        if (ingredients.value.length) {
+                            ingredientRows.value = ingredients.value.map((item) => {
+                                return {
+                                    id: typeof item.id !== 'undefined' ? item.id : null,
+                                    name: typeof item.name !== 'undefined' ? item.name : '',
+                                    category_id: typeof item.category_id !== 'undefined' ? item.category_id : null,
+                                    price: typeof item.price !== 'undefined' ? item.price : 0,
+                                    measure: typeof item.measure !== 'undefined' ? item.measure : 'Kg',
+                                    type: 'ingredient',
+                                    created: true
+                                }
+                            })
+                        } else {
+                            ingredientRows.value = [modelIngredients.value];
+                        }
+                    });
+                }
             };
 
             watch(() => category.value,

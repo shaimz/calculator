@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\FoodIngredientController;
 use App\Http\Controllers\Api\UserController;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,8 @@ Route::prefix('api')->group(function(){
     Route::get('logout', [UserController::class, 'logout'])->middleware('auth');
 
 });
+
+Route::post('api/food-ingredient/{food_ingredient}',[FoodIngredientController::class,'destroy']);
 
 
 Route::get('{any}', function () {

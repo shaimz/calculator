@@ -16,6 +16,12 @@
     <!-- Styles -->
     <link href="{{ asset('js/components/main.css') }}" rel="stylesheet">
     {{--<link href="{{ asset('css/app.css') }}" rel="stylesheet">--}}
+    <style>
+        @font-face{
+            font-family:element-icons;
+            src: url('{{asset('js/fonts/element-icons.ttf')}}');
+        }
+    </style>
 </head>
 <body>
 @if (Auth::check())

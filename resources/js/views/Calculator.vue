@@ -6,7 +6,9 @@
         <el-tab-pane name="calculator" label="Calculator" class="justify-content-center">
             <calculation v-if="active === 'calculator'"></calculation>
         </el-tab-pane>
-        <el-tab-pane v-if="active === 'menu'" name="menu" label="tobe" class="justify-content-center"></el-tab-pane>
+        <el-tab-pane name="menu" label="Menu" class="justify-content-center">
+            <realization v-if="active === 'menu'"></realization>
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -14,9 +16,10 @@
     import {defineComponent, ref, onMounted, computed} from 'vue';
     import ingredients from '../components/ingredients';
     import calculation from '../components/calculation';
+    import realization from '../components/realization';
 
     export default defineComponent({
-        components: {ingredients, calculation},
+        components: {ingredients, calculation, realization},
         setup() {
             const name = ref('');
             const active = ref('ingredients');

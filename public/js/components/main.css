@@ -24956,3 +24956,29 @@ h3 {
 .el-table__row > td {
   padding: 0 !important;
 }
+
+.el-transfer-panel {
+  width: 100% !important;
+}
+.el-transfer-panel .el-transfer-panel__body label span.el-checkbox__label {
+  max-width: 270px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.el-transfer__buttons {
+  max-width: 280px;
+  width: 100%;
+  text-align: center;
+}
+.el-transfer__buttons .el-button:not(.is-disabled):nth-last-child(2) {
+  background: #F56C6C;
+}
+.el-transfer__buttons .el-button:not(.is-disabled):nth-last-child(1) {
+  background: #85CE61;
+}
+
+.el-button.el-button--success[data-id=add_i] {
+  padding: 10px;
+}

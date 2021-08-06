@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\FoodIngredient;
+use App\Models\Ingredient;
 use Illuminate\Http\Request;
 
 class FoodIngredientController extends Controller
@@ -38,16 +39,15 @@ class FoodIngredientController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:255'
-        ]);
 
-        $foodI = new FoodIngredient();
-        $foodI->name = $request->name;
-        $foodI->food_id = $request->food_id;
-        $foodI->portions = $request->portions;
-        $foodI->price_portion = $request->price_portion;
-        $foodI->save();
+        foreach($request->ingredients as $id => $quantity){
+            $foodI = new FoodIngredient();
+            $foodI->ingredient_id = $id;
+            $foodI->food_id = $request->food_id;
+            $foodI->quantity = $quantity;
+            $foodI->save();
+        }
+
 
         return response()->json($foodI->id);
     }
@@ -83,11 +83,12 @@ class FoodIngredientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $foodI = FoodIngredient::find($id);
-        $foodI->name = $request->name ?? '';
-        $foodI->portions = $request->portions ?? 0;
-        $foodI->price_portion = $request->price_portion ?? 0;
-        $foodI->save();
+        $ingredients = (array) $request->ingredients;
+        foreach($ingredients as $id => $data){
+           $ingredient = FoodIngredient::where('ingredient_id',$id)->first();
+           $ingredient->quantity = (int) $data;
+           $ingredient->save();
+        }
 
         return response()->json();
     }
@@ -98,8 +99,13 @@ class FoodIngredientController extends Controller
      * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
-        //
+        $ingredients = $request->ingredients;
+        foreach($ingredients as $key => $quantity){
+            if($result = FoodIngredient::where('ingredient_id',$key)->where('food_id',$id)) $result->delete();
+        }
+
+        return response()->json();
     }
 }

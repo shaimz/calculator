@@ -19,7 +19,7 @@
                        :rows="foodRows">
             </dataTable>
 
-            <modal @modal="toggleModal" :food="food" :data="modalFoods" :group="group" :dialog="modal"></modal>
+            <modal @modal="toggleModal" :itemId="food" :data="modalFoods" :group="group" :food="foodName" :dialog="modal"></modal>
 
             <dataTable id="food-ingredient-list" v-if="food_ingredientRows[0].created" @loading="setLoading" :loading="loading" :key="food_ingredientRows" :get="'getFoodIngredients'" :add="'setFoodIngredient'" :update="'updateFoodIngredient'"
                        :item-id="group"
@@ -84,31 +84,36 @@
 
             //Foods
             const foods = computed(() => store.state.foods);
-            const modalFoods = foods.value.map((item) => {return {key:item.id,label:item.name}});
+            const categories = computed(() => store.state.categories);
+            store.dispatch('getCategories',{});
+            const modalFoods = computed(() => categories.value.map((item) => {return {key:item.id,name:item.name}}));
             let modelFoods = ref({name: '', portions: 0, price_portion: 0, type: 'food', edited: false});
             let foodRows = ref([{...modelFoods.value}]);
-            const food = ref(typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null);
+            const food = computed(() => typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null);
+            const foodName = computed(() => typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null);
 
-            const fetchFoods = (group_id) => {
-                loading.value = true;
-                store.dispatch('getFoods', {group_id: group_id}).then(() => {
-                    loading.value = false;
-                    if (foods.value.length) {
-                        foodRows.value = foods.value.map((item) => {
-                            return {
-                                id: typeof item.id !== 'undefined' ? item.id : null,
-                                name: typeof item.name !== 'undefined' ? item.name : '',
-                                group_id: typeof item.group_id !== 'undefined' ? item.group_id : null,
-                                portions: typeof item.portions !== 'undefined' ? item.portions : 0,
-                                price_portion: typeof item.price_portion !== 'undefined' ? item.price_portion: 0,
-                                type: 'food',
-                                created: true,
-                            }
-                        })
-                    } else {
-                        foodRows.value = [{...modelFoods.value}];
-                    }
-                });
+            const fetchFoods = async (group_id) => {
+                if(group_id){
+                    loading.value = true;
+                    await store.dispatch('getFoods', {group_id: group_id}).then(() => {
+                        loading.value = false;
+                        if (foods.value.length) {
+                            foodRows.value = foods.value.map((item) => {
+                                return {
+                                    id: typeof item.id !== 'undefined' ? item.id : null,
+                                    name: typeof item.name !== 'undefined' ? item.name : '',
+                                    group_id: typeof item.group_id !== 'undefined' ? item.group_id : null,
+                                    portions: typeof item.portions !== 'undefined' ? item.portions : 0,
+                                    price_portion: typeof item.price_portion !== 'undefined' ? item.price_portion: 0,
+                                    type: 'food',
+                                    created: true,
+                                }
+                            })
+                        } else {
+                            foodRows.value = [{...modelFoods.value}];
+                        }
+                    });
+                }
             };
 
             watch(() => group.value,
@@ -133,26 +138,28 @@
             let food_ingredientRows = ref([{...modelFoodIngredients.value}]);
 
             const fetchFoodIngredients = (food_id) => {
-                loading.value = true;
-                store.dispatch('getFoodIngredients', {food_id: food_id}).then(() => {
-                    loading.value = false;
-                    if (food_ingredients.value.length) {
-                        console.log(food_ingredients.value.length);
-                        food_ingredientRows.value = food_ingredients.value.map((item) => {
-                            return {
-                                id: typeof item.id !== 'undefined' ? item.id : null,
-                                name: typeof item.name !== 'undefined' ? item.name : '',
-                                food_id: typeof item.food_id !== 'undefined' ? item.food_id : null,
-                                portions: typeof item.portions !== 'undefined' ? item.portions : 0,
-                                price_portion: typeof item.price_portion !== 'undefined' ? item.price_portion: 0,
-                                type: 'food_ingredient',
-                                created: true,
-                            }
-                        })
-                    } else {
-                        food_ingredientRows.value = [{...modelFoodIngredients.value}];
-                    }
-                });
+                if(food_id){
+                    loading.value = true;
+                    store.dispatch('getFoodIngredients', {food_id: food_id}).then(() => {
+                        loading.value = false;
+                        if (food_ingredients.value.length) {
+                            console.log(food_ingredients.value.length);
+                            food_ingredientRows.value = food_ingredients.value.map((item) => {
+                                return {
+                                    id: typeof item.id !== 'undefined' ? item.id : null,
+                                    name: typeof item.name !== 'undefined' ? item.name : '',
+                                    food_id: typeof item.food_id !== 'undefined' ? item.food_id : null,
+                                    portions: typeof item.portions !== 'undefined' ? item.portions : 0,
+                                    price_portion: typeof item.price_portion !== 'undefined' ? item.price_portion: 0,
+                                    type: 'food_ingredient',
+                                    created: true,
+                                }
+                            })
+                        } else {
+                            food_ingredientRows.value = [{...modelFoodIngredients.value}];
+                        }
+                    });
+                }
             };
 
             watch(() => group.value,
@@ -186,8 +193,10 @@
                 setGroup,
                 group,
                 food,
+                foodName,
                 modelFoodIngredients,
                 food_ingredientRows,
+                categories,
                 loading,
                 setLoading,
                 modal,

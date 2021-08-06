@@ -28,7 +28,7 @@ import {
     ElOption,
     ElTransfer,
     ElDialog,
-    ElIcon
+    ElIcon,
 } from 'element-plus';
 
 const components = [
@@ -50,6 +50,7 @@ const components = [
 components.forEach(component => {
     app.component(component.name, component)
 });
+
 
 import {ElLoading} from 'element-plus';
 app.use(ElLoading);

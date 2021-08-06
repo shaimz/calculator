@@ -2,8 +2,8 @@
     <el-button type="success" @click="addRow()" round>Adding row</el-button>
     <el-table :key="datas" :data="datas" :row-class-name="cellClass" :lazy="true" v-loading="load" border height="350" style="width:100%;margin-top: 15px;" current-row-key="40" @row-click="handleChange" highlight-current-row>
         <el-table-column labell="" width="50px" v-if="checkProperty('type')">
-            <template #default="scope" v-if="['category','group'].includes(datas[0].type)">
-                <span v-if="scope.row.id === itemId" class="rounded-circle bg-success active m-auto"></span>
+            <template #default="scope" v-if="['category','group','food'].includes(datas[0].type)">
+                <span v-if="scope.row.id === itemId || scope.row.id === food" class="rounded-circle bg-success active m-auto"></span>
             </template>
         </el-table-column>
         <el-table-column label="Name" width="250" v-if="checkProperty('name')">
@@ -50,7 +50,7 @@
 
         <el-table-column label="" width="200">
             <template #default="scope">
-                <el-button data-id="add" v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index) && props.get === 'getFoods'" size="mini" type="success" icon="el-icon-check" circle @click="addItems()"></el-button>
+                <el-button data-id="add_i" v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index) && props.get === 'getFoods'" size="mini" type="success" icon="el-icon-plus" circle @click="addItems()"></el-button>
                 <el-button data-id="add" v-if="!checkProperty('created',scope.$index)" size="mini" type="success" @click="add(scope.$index)">Add</el-button>
                 <el-button data-id="edit" v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index)" size="mini" type="primary" @click="setEdit($event,scope.$index)">Edit</el-button>
                 <el-button data-id="update" v-if="checkProperty('edited',scope.$index) && checkProperty('created',scope.$index)" size="mini" type="success" @click="update(scope.$index)">Save</el-button>
@@ -100,6 +100,7 @@
                 }
             });
             const itemId = computed(() => props.itemId);
+            const food = computed(() => props.food);
             const datas = ref([...props.rows]);
             const model = reactive({...props.model});
             const addRow = () => {
@@ -210,6 +211,7 @@
                 loading,
                 load,
                 props,
+                food,
                 addRow,
                 handleDelete,
                 checkProperty,
