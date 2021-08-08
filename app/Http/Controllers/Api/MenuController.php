@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Menu;
 use Illuminate\Http\Request;
-use App\Models\Food;
 
-class FoodController extends Controller
+class MenuController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,8 +16,7 @@ class FoodController extends Controller
      */
     public function index(Request $request)
     {
-        $group_id = $request->group_id;
-        return response()->json(Food::where('group_id',$group_id)->get());
+        return response()->json(Menu::with('food')->get());
     }
 
     /**
@@ -33,27 +32,22 @@ class FoodController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:255'
-        ]);
+        $exists = Menu::where(['food_id' => $request->food_id])->with('food')->first();
+        if (!$exists) {
+            $menu = new Menu();
+            $menu->name = $request->name;
+            $menu->food_id = $request->food_id;
+            $menu->save();
 
-        $db_data = Food::where('name',$request->name)->first();
+            $response = Menu::where('id', $menu->id)->with('food')->first();
 
-        if(!$db_data) {
-            $food = new Food();
-            $food->name = $request->name;
-            $food->group_id = $request->group_id;
-            $food->portions = $request->portions;
-            $food->price_portion = $request->price_portion;
-            $food->save();
+            return response()->json($response);
         }
-
-        return response()->json($food->id ?? ['error' => 'Exists']);
     }
 
     /**
@@ -64,7 +58,7 @@ class FoodController extends Controller
      */
     public function show($id)
     {
-        return response()->json(Food::where('group_id',$id)->get());
+        return response()->json(Menu::where('food_id', $id)->with('food')->with('ingredient')->get());
     }
 
     /**
@@ -81,17 +75,18 @@ class FoodController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @param  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $food = Food::find($id);
-        $food->name = $request->name ?? '';
-        $food->portions = $request->portions ?? 0;
-        $food->price_portion = $request->price_portion ?? 0;
-        $food->save();
+        $ingredients = (array)$request->ingredients;
+        foreach ($ingredients as $id => $data) {
+            $ingredient = FoodIngredient::where('ingredient_id', $id)->first();
+            $ingredient->quantity = (int)$data;
+            $ingredient->save();
+        }
 
         return response()->json();
     }
@@ -102,8 +97,13 @@ class FoodController extends Controller
      * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $ingredients = $request->ingredients;
+        foreach ($ingredients as $key => $quantity) {
+            if ($result = FoodIngredient::where('ingredient_id', $key)->where('food_id', $id)->where('category_id', $request->category_id)) $result->delete();
+        }
+
+        return response()->json();
     }
 }

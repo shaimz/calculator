@@ -30,7 +30,6 @@
             };
 
             onMounted(() => {
-                console.log(tabName)
                 if (tabName.value !== 'undefined' && tabName.value) active.value = tabName.value;
             })
 

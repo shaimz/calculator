@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Models\Ingredient;
+use App\Models\MenuItem;
 use Illuminate\Http\Request;
 
-class IngredientController extends Controller
+class MenuItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @param $category_id
+     * @param $menu_id
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-
+        $menu_id = $request->menu_id;
+        return response()->json(MenuItem::where('menu_id',$menu_id)->get());
     }
 
     /**
@@ -42,18 +42,16 @@ class IngredientController extends Controller
             'name' => 'required|max:255'
         ]);
 
-        $db_data = Ingredient::where('name',$request->name)->first();
+        $db_data = MenuItem::where('menu_id',$request->menu_id)->where('food_id',$request->food_id)->first();
 
-        if(!$db_data){
-            $ingredient = new Ingredient();
-            $ingredient->name = $request->name;
-            $ingredient->category_id = $request->category_id;
-            $ingredient->price = $request->price;
-            $ingredient->measure = $request->measure;
-            $ingredient->save();
+        if(!$db_data) {
+            $item = new MenuItem();
+            $item->food_id = $request->food_id;
+            $item->menu_id = $request->menu_id;
+            $item->save();
         }
 
-        return response()->json($ingredient->id ?? ['error' => 'Exists']);
+        return response()->json($item->id ?? ['error' => 'Exists']);
     }
 
     /**
@@ -64,10 +62,7 @@ class IngredientController extends Controller
      */
     public function show($id)
     {
-        if($id === 'all'){
-            return response()->json(Category::with('ingredients')->get());
-        }
-        return response()->json(Ingredient::where('category_id',$id)->get());
+        return response()->json(MenuItem::where('food_id',$id)->get());
     }
 
     /**
@@ -90,11 +85,10 @@ class IngredientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $ingredient = Ingredient::find($id);
-        $ingredient->name = $request->name ?? '';
-        $ingredient->measure = $request->measure ?? 'kg';
-        $ingredient->price = $request->price ?? 0;
-        $ingredient->save();
+        $item = MenuItem::find($id);
+        $item->food_id = $request->food_id ?? 0;
+        $item->menu_id = $request->menu_id ?? 0;
+        $item->save();
 
         return response()->json();
     }

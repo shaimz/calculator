@@ -136,7 +136,8 @@ export const store = createStore({
             state.food_ingredients = data;
         },
         ADD_FOOD_INGREDIENT(state, data){
-            let exists = state.food_ingredients.find((i) => i.name === data.name);
+            console.log(data);
+            let exists = state.food_ingredients.find((i) => i.name === data.food.name);
 
             if (!exists) {
                 let result = {...data};

@@ -1,36 +1,46 @@
 <template>
     <el-dialog title="Ingredients" v-model="modal">
-        <el-transfer
-            v-model="rightValues"
-            style="text-align: left; display: inline-block"
-            :titles="['All ingredients', 'Ingredients ' + capital(foodName)]"
-            :button-texts="['Remove', 'Add']"
-            :format="{
-          noChecked: '${total}',
-          hasChecked: '${checked}/${total}'
-        }"
-            :data="data"
-            @change="handleChange"
-        >
-            <template #default="{ option }" class="d-flex justify-content-between align-items-center">
-                <span>{{ option.name }}</span>
-                <input @change="handleUpdate" type="number" v-model="quantity[option.key]" class="quantity-input">
-            </template>
-            <!--<template #left-footer>-->
-                <!--<el-button class="transfer-footer" size="small">Operation</el-button>-->
-            <!--</template>-->
-            <!--<template #right-footer>-->
-                <!--<el-button class="transfer-footer" size="small">Operation</el-button>-->
-            <!--</template>-->
-        </el-transfer>
+<!--        <el-transfer-->
+<!--            v-model="rightValues"-->
+<!--            style="text-align: left; display: inline-block"-->
+<!--            :titles="['All ingredients', 'Ingredients ' + capital(foodName)]"-->
+<!--            :button-texts="['Remove', 'Add']"-->
+<!--            :format="{-->
+<!--          noChecked: '${total}',-->
+<!--          hasChecked: '${checked}/${total}'-->
+<!--        }"-->
+<!--            :data="data"-->
+<!--            @change="handleChange"-->
+<!--        >-->
+<!--            <template #default="{ option }" class="d-flex justify-content-between align-items-center">-->
+<!--                <span>{{ option.name }}</span>-->
+<!--                <el-checkbox-group fill="#ffc90e" v-model="rightValues">-->
+<!--                    <el-checkbox v-for="child in option.children" :label="child.name" @change="handleCheck(child)">-->
+<!--                        <template #default="scope">-->
+<!--                            <span>{{child.name}}</span>-->
+<!--                            <input @change="handleUpdate" type="number" v-model="quantity[option.key]" class="quantity-input">-->
+<!--                        </template>-->
+<!--                    </el-checkbox>-->
+<!--                </el-checkbox-group>-->
+<!--            </template>-->
+<!--            &lt;!&ndash;<template #left-footer>&ndash;&gt;-->
+<!--                &lt;!&ndash;<el-button class="transfer-footer" size="small">Operation</el-button>&ndash;&gt;-->
+<!--            &lt;!&ndash;</template>&ndash;&gt;-->
+<!--            &lt;!&ndash;<template #right-footer>&ndash;&gt;-->
+<!--                &lt;!&ndash;<el-button class="transfer-footer" size="small">Operation</el-button>&ndash;&gt;-->
+<!--            &lt;!&ndash;</template>&ndash;&gt;-->
+<!--        </el-transfer>-->
+        <ElTransferGroup :food="foodName" :itemId="itemId" :quantity="quantity" :left-list="left" :right-list="right" />
     </el-dialog>
 </template>
 
 <script>
     import {defineComponent, ref, computed, watch} from 'vue';
     import {useStore} from 'vuex';
+    import ElTransferGroup from "./transfer/el-transfer-group";
 
     export default defineComponent({
+        components: {ElTransferGroup},
         props:['dialog','itemId','food','group','data'],
         emits:['modal'],
         setup(props, context){
@@ -42,11 +52,28 @@
             const foodName = computed(() => props.food);
             const itemId = computed(() => props.itemId);
             const quantity = ref({});
+            const checked = ref([]);
             const ingredients = computed(() => store.state.food_ingredients);
 
             // const right = computed(() => ingredients.value.map((item) => {return {key:item.id,name:Object.values(data.value.find((elem) => elem.key === item.ingredient_id))[1]}}));
-            const right = computed(() => ingredients.value.map((item,index) => item.ingredient_id));
-            const left = computed(() => ingredients.value.filter((item) => !data.value.some((elem) => elem.key !== item.ingredient_id)));
+            const right = computed(() => ingredients.value.map((item,index) => {return {key:item.ingredient_id,name:item.ingredient.name,category_id:item.category_id, fixed:true}}));
+            // const left = computed(() => {
+            //     return data.value.map((el) => el.children.filter((item) => !data.value.some((elem) => elem.key !== item.ingredient_id)))
+            // });
+            const left = ref([]);
+            const leftSide = () => {
+                left.value = data.value.map((item) => {
+                    let result = {...item};
+                    result.children = item.children.filter((el) => !right.value.some((elem) => elem.key === el.key))
+                    return result;
+                });
+            }
+
+            watch(() => right.value, (n,o) => {
+                if(n !== o){
+                    leftSide()
+                }
+            },{immediate:true})
 
             const rightValues = ref([]);
             watch(() => right.value, (n,o) => {
@@ -66,31 +93,6 @@
                 }
             })
 
-
-
-            const handleChange = (value, direction, movedKeys) => {
-                let data = {};
-                data['ingredients'] = quantity.value;
-                data['food_id'] = props.itemId;
-                if(direction === 'right'){
-                    store.dispatch('setFoodIngredient',data)
-                }else{
-                    store.dispatch('deleteFoodIngredient',data);
-                }
-            };
-
-            const handleUpdate = () => {
-                let data = {};
-                data['ingredients'] = quantity.value;
-                data['food_id'] = props.itemId;
-
-                let bool = right.value.find((elem,i) => Object.keys(quantity.value)[i])
-
-                if(bool){
-                    store.dispatch('updateFoodIngredient',data)
-                }
-            }
-
             const openDialog = () => {
                 modal.value = true;
             };
@@ -107,10 +109,6 @@
                 }
             });
 
-            const capital = (text) => {
-                return text.charAt(0).toUpperCase() + text.slice(1);
-            }
-
             return{
                 dialog,
                 left,
@@ -121,11 +119,9 @@
                 foodName,
                 itemId,
                 quantity,
+                checked,
                 ingredients,
-                handleChange,
-                handleUpdate,
                 openDialog,
-                capital
             }
         }
     })

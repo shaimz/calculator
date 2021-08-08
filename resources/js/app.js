@@ -29,8 +29,14 @@ import {
     ElTransfer,
     ElDialog,
     ElIcon,
+    ElTree,
+    ElCheckboxGroup,
+    ElCheckbox,
+    ElCollapse,
+    ElCollapseItem
 } from 'element-plus';
 
+import ElTransferGroup from '../js/components/transfer/el-transfer-group';
 const components = [
     ElMenuItem,
     ElMenu,
@@ -44,7 +50,13 @@ const components = [
     ElOption,
     ElTransfer,
     ElDialog,
-    ElIcon
+    ElIcon,
+    ElTree,
+    ElCheckboxGroup,
+    ElCheckbox,
+    ElCollapse,
+    ElCollapseItem,
+    ElTransferGroup
 ];
 
 components.forEach(component => {

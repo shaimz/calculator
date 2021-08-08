@@ -34,6 +34,7 @@
         "mini-css-extract-plugin": "^2.1.0",
         "uglifyjs-webpack-plugin": "^2.2.0",
         "vue-router": "^4.0.10",
+        "vuedraggable": "^4.0.3",
         "vuetify-loader": "^1.7.2",
         "vuex": "^4.0.2",
         "webpack": "^5.47.1",

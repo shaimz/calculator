@@ -73,7 +73,7 @@
             };
 
             const ingredients = computed(() => store.state.ingredients);
-            let modelIngredients = ref({name: '', price: 0, price_portion: 0, portions: 0, type: 'ingredient', edited: false});
+            let modelIngredients = ref({name: '', price: 0, measure: 'kg', portions: 0, type: 'ingredient', edited: false});
             let ingredientRows = ref([modelIngredients.value]);
 
             const fetchIngredients = (category_id) => {
@@ -103,7 +103,6 @@
             watch(() => category.value,
                 (n, o) => {
                     if (n !== o) {
-                        console.log({category:[n,o]});
                         fetchIngredients(category.value)
                     }
                 }, {immediate: true});

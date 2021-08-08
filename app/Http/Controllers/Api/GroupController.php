@@ -41,11 +41,15 @@ class GroupController extends Controller
             'name' => 'required|max:255'
         ]);
 
-        $group = new Group();
-        $group->name = $request->name;
-        $group->save();
+        $db_data = Group::where('name',$request->name)->first();
 
-        return response()->json($group->id);
+        if(!$db_data) {
+            $group = new Group();
+            $group->name = $request->name;
+            $group->save();
+        }
+
+        return response()->json($group->id ?? ['error' => 'Exists']);
     }
 
     /**

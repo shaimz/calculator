@@ -8,12 +8,13 @@
         </el-table-column>
         <el-table-column label="Name" width="250" v-if="checkProperty('name')">
             <template #default="scope">
+                <span class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
                 <el-input v-model="scope.row.name" type="text" @click="stopPropagation($event)" v-if="checkProperty('edited',scope.$index)"></el-input>
                 <span v-else>{{scope.row.name}}</span>
             </template>
         </el-table-column>
 
-        <el-table-column label="Portions" width="100" v-if="checkProperty('measure')">
+        <el-table-column label="Measure" width="100" v-if="checkProperty('measure')">
             <template #default="scope">
                 <el-select v-model="scope.row.measure" @click="stopPropagation($event)" placeholder="Select" v-if="checkProperty('edited',scope.$index)">
                     <el-option
@@ -102,6 +103,7 @@
             const itemId = computed(() => props.itemId);
             const food = computed(() => props.food);
             const datas = ref([...props.rows]);
+            const error = ref([]);
             const model = reactive({...props.model});
             const addRow = () => {
                 datas.value.push({...model})
@@ -123,19 +125,19 @@
                 }
 
                 if(data.name){
-                    store.dispatch(props.add,data).then(() => {
+                    store.dispatch(props.add,data).then((r) => {
                         let params = {};
+                        let item = datas.value[index];
                         params[type] = itemId.value;
-                        props.rows.map((item) => {
-                            if(!item.hasOwnProperty('created')){
+                            if(!item.hasOwnProperty('created') && item.name){
                                 item.created = true;
                                 delete item.edited;
-                                return item;
                             }
-                        })
                         loading.value = true;
                         store.dispatch(props.get,params).then(() => loading.value = false);
                     });
+                } else{
+                    error.value[index] = 'Name is empty'
                 }
             };
             const update = (index) => {
@@ -212,6 +214,7 @@
                 load,
                 props,
                 food,
+                error,
                 addRow,
                 handleDelete,
                 checkProperty,

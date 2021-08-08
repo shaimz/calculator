@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Food;
 use App\Models\FoodIngredient;
 use App\Models\Ingredient;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class FoodIngredientController extends Controller
     public function index(Request $request)
     {
         $food_id = $request->food_id;
-        return response()->json(FoodIngredient::where('food_id',$food_id)->get());
+        return response()->json(FoodIngredient::where('food_id',$food_id)->with('food')->with('ingredient')->get());
     }
 
     /**
@@ -41,15 +42,20 @@ class FoodIngredientController extends Controller
     {
 
         foreach($request->ingredients as $id => $quantity){
-            $foodI = new FoodIngredient();
-            $foodI->ingredient_id = $id;
-            $foodI->food_id = $request->food_id;
-            $foodI->quantity = $quantity;
-            $foodI->save();
+            $exists = FoodIngredient::where(['food_id' => $request->food_id, 'ingredient_id' => $id])->with('ingredient')->with('food')->first();
+            if(!$exists){
+                $foodI = new FoodIngredient();
+                $foodI->ingredient_id = $id;
+                $foodI->food_id = $request->food_id;
+                $foodI->category_id = $request->category_id;
+                $foodI->quantity = $quantity;
+                $foodI->save();
+
+                $response = FoodIngredient::where('id',$foodI->id)->with('food')->with('ingredient')->first();
+
+                return response()->json($response);
+            }
         }
-
-
-        return response()->json($foodI->id);
     }
 
     /**
@@ -60,7 +66,7 @@ class FoodIngredientController extends Controller
      */
     public function show($id)
     {
-        return response()->json(FoodIngredient::where('food_id',$id)->get());
+        return response()->json(FoodIngredient::where('food_id',$id)->with('food')->with('ingredient')->get());
     }
 
     /**
@@ -103,7 +109,7 @@ class FoodIngredientController extends Controller
     {
         $ingredients = $request->ingredients;
         foreach($ingredients as $key => $quantity){
-            if($result = FoodIngredient::where('ingredient_id',$key)->where('food_id',$id)) $result->delete();
+            if($result = FoodIngredient::where('ingredient_id',$key)->where('food_id',$id)->where('category_id',$request->category_id)) $result->delete();
         }
 
         return response()->json();

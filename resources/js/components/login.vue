@@ -62,7 +62,6 @@
                         password: password.value
                     })
                         .then(response => {
-                            console.log(response.data)
                             if (response.data.success) {
                                 router.push({name:'Calculator'})
                             } else {

@@ -27,11 +27,29 @@
 .el-transfer-panel{
     width:100% !important;
     .el-transfer-panel__body{
-        label span.el-checkbox__label{
-            max-width: 270px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
+        .el-checkbox.is-disabled{
+            & > .el-checkbox__label > span{
+                color:black !important;
+                font-size: 18px !important;
+                font-weight: bold !important;
+            }
+        }
+        label {
+            height: auto;
+            margin-right: 0;
+            span.el-checkbox__label{
+                max-width: 270px !important;
+                .el-checkbox-group{
+                    display: flex;
+                    flex-direction: column;
+                    .el-checkbox__label{
+                        max-width: 270px !important;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                    }
+                }
+            }
         }
     }
 }
@@ -49,3 +67,7 @@
 .el-button.el-button--success[data-id=add_i]{
     padding: 10px;
 }
+.list-group-item.not-draggable{
+    -webkit-user-drag: unset;
+}
+

@@ -47,14 +47,12 @@
             if (window.Laravel.isLoggedin) isLoggedIn.value = true
 
             const logout = (e) => {
-                console.log('ss')
                 e.preventDefault()
                 axios.get('/api/logout')
                     .then(response => {
                         if (response.data.success) {
                             window.location.href = "/calculator"
                         } else {
-                            console.log(response)
                         }
                     })
                     .catch(function (error) {
