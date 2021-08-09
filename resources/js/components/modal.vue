@@ -1,5 +1,5 @@
 <template>
-    <el-dialog title="Ingredients" v-model="modal">
+    <el-dialog :title="props.type === 'group' ? 'Ingredients' : 'Menu'" v-model="modal">
 <!--        <el-transfer-->
 <!--            v-model="rightValues"-->
 <!--            style="text-align: left; display: inline-block"-->
@@ -30,50 +30,67 @@
 <!--                &lt;!&ndash;<el-button class="transfer-footer" size="small">Operation</el-button>&ndash;&gt;-->
 <!--            &lt;!&ndash;</template>&ndash;&gt;-->
 <!--        </el-transfer>-->
-        <ElTransferGroup :food="foodName" :itemId="itemId" :quantity="quantity" :left-list="left" :right-list="right" />
+        <ElTransferGroup @fetchItems="emitFetch" :itemId="itemId" :name="name" :type="props.type" :price="price" :quantity="quantity" :left-list="left" :right-list="right" v-if="test"/>
     </el-dialog>
 </template>
 
 <script>
-    import {defineComponent, ref, computed, watch} from 'vue';
+    import {defineComponent, ref, computed, watch, toRefs, onMounted} from 'vue';
     import {useStore} from 'vuex';
     import ElTransferGroup from "./transfer/el-transfer-group";
 
     export default defineComponent({
         components: {ElTransferGroup},
-        props:['dialog','itemId','food','group','data'],
+        props:['dialog','itemId','group','data','reset','name','menu','type'],
         emits:['modal'],
         setup(props, context){
+            console.log('rerender modal')
             const store = useStore();
             const dialog = computed(() => props.dialog);
             const modal = ref(dialog.value);
             const data = computed(() => props.data);
+            const name = ref('Mancaruri');
 
-            const foodName = computed(() => props.food);
+            const test = ref(true);
+
             const itemId = computed(() => props.itemId);
+            const id = toRefs(props).itemId;
             const quantity = ref({});
+            const price = ref({});
             const checked = ref([]);
             const ingredients = computed(() => store.state.food_ingredients);
+            const items = computed(() => store.state.menu_items);
 
-            // const right = computed(() => ingredients.value.map((item) => {return {key:item.id,name:Object.values(data.value.find((elem) => elem.key === item.ingredient_id))[1]}}));
-            const right = computed(() => ingredients.value.map((item,index) => {return {key:item.ingredient_id,name:item.ingredient.name,category_id:item.category_id, fixed:true}}));
+            const right = computed(() => {
+                if(props.type === 'group'){
+                    return ingredients.value.map((item,index) => {return {key:item.ingredient_id,name:item.ingredient.name,category_id:item.category_id, price_portion:item.food.price_portion,portions:item.food.portions, fixed:true}});
+                }else{
+                    return items.value.map((item,index) => {return {key:item.food_id,name:item.food.name,price_portion:item.food.price_portion,portions:item.food.portions,menu_id:item.menu_id,group_id:item.group_id, fixed:true}})
+                }
+            });
             // const left = computed(() => {
             //     return data.value.map((el) => el.children.filter((item) => !data.value.some((elem) => elem.key !== item.ingredient_id)))
             // });
             const left = ref([]);
+
+            // const left = computed(() => data.value.map((item) => {
+            //     let result = {...item};
+            //     result.children = item.children.filter((el) => !right.value.some((elem) => elem.key === el.key));
+            //     return result;
+            // }))
             const leftSide = () => {
                 left.value = data.value.map((item) => {
                     let result = {...item};
-                    result.children = item.children.filter((el) => !right.value.some((elem) => elem.key === el.key))
+                    result.children = item.children.filter((el) => !right.value.some((elem) => elem.key === el.key));
                     return result;
                 });
-            }
+            };
 
             watch(() => right.value, (n,o) => {
                 if(n !== o){
-                    leftSide()
+                    leftSide();
                 }
-            },{immediate:true})
+            },{immediate:true});
 
             const rightValues = ref([]);
             watch(() => right.value, (n,o) => {
@@ -83,15 +100,37 @@
             })
 
 
+            watch(() => props.group, (n,o) => {
+              if(n !== o){
+                  quantity.value = {};
+              }
+            });
+
+            watch(() => props.menu, (n,o) => {
+                if(n !== o){
+                    price.value = {};
+                }
+            });
+
             watch(() => itemId.value, (n,o) => {
                 if(n !== o){
                     if(itemId.value){
-                        store.dispatch('getFoodIngredients',{food_id:itemId.value}).then(() => {
-                            ingredients.value.map((item) => quantity.value[item.ingredient_id] = item.quantity)
-                        });
+                        quantity.value = {};
+                        price.value = {};
+                        if(props.type === 'group'){
+                            store.dispatch('getFoodIngredients',{food_id:itemId.value}).then(() => {
+                                console.log(ingredients.value);
+                                ingredients.value.map((item) => quantity.value[item.ingredient_id] = item.quantity)
+                            });
+                        }else{
+                            store.dispatch('getMenuItems',{menu_id:itemId.value}).then(() => {
+                            console.log(items.value);
+                                items.value.map((item) => price.value[item.food_id] = item.food.price_portion)
+                            });
+                        }
                     }
                 }
-            })
+            },{immediate:true})
 
             const openDialog = () => {
                 modal.value = true;
@@ -109,6 +148,10 @@
                 }
             });
 
+            const emitFetch = () => {
+                context.emit('fetchItems',true);
+            }
+
             return{
                 dialog,
                 left,
@@ -116,12 +159,18 @@
                 rightValues,
                 modal,
                 data,
-                foodName,
                 itemId,
+                id,
                 quantity,
+                price,
                 checked,
                 ingredients,
+                items,
                 openDialog,
+                props,
+                name,
+                test,
+                emitFetch
             }
         }
     })

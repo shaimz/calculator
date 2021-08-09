@@ -16,7 +16,7 @@ class GroupController extends Controller
      */
     public function index()
     {
-        return response()->json(Group::all());
+        return response()->json(Group::with('foods')->get());
     }
 
     /**
@@ -60,7 +60,7 @@ class GroupController extends Controller
      */
     public function show($id)
     {
-        return response()->json(Group::where('id',$id)->get());
+        return response()->json(Group::where('id',$id)->with('foods')->get());
     }
 
     /**

@@ -2,8 +2,8 @@
     <el-button type="success" @click="addRow()" round>Adding row</el-button>
     <el-table :key="datas" :data="datas" :row-class-name="cellClass" :lazy="true" v-loading="load" border height="350" style="width:100%;margin-top: 15px;" current-row-key="40" @row-click="handleChange" highlight-current-row>
         <el-table-column labell="" width="50px" v-if="checkProperty('type')">
-            <template #default="scope" v-if="['category','group','food'].includes(datas[0].type)">
-                <span v-if="scope.row.id === itemId || scope.row.id === food" class="rounded-circle bg-success active m-auto"></span>
+            <template #default="scope" v-if="['category','group','food','menu'].includes(datas[0].type)">
+                <span v-if="(scope.row.id === itemId && itemId !== 'undefined') || (scope.row.id === food && food !== 'undefined')" class="rounded-circle bg-success active m-auto"></span>
             </template>
         </el-table-column>
         <el-table-column label="Name" width="250" v-if="checkProperty('name')">
@@ -11,6 +11,14 @@
                 <span class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
                 <el-input v-model="scope.row.name" type="text" @click="stopPropagation($event)" v-if="checkProperty('edited',scope.$index)"></el-input>
                 <span v-else>{{scope.row.name}}</span>
+            </template>
+        </el-table-column>
+
+        <el-table-column label="Quantity" width="250" v-if="checkProperty('quantity')">
+            <template #default="scope">
+                <span class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
+                <el-input v-model="scope.row.quantity" type="number" @click="stopPropagation($event)" v-if="checkProperty('edited',scope.$index)"></el-input>
+                <span v-else>{{scope.row.quantity}}</span>
             </template>
         </el-table-column>
 
@@ -49,10 +57,26 @@
             </template>
         </el-table-column>
 
+        <el-table-column label="Date" width="150" v-if="checkProperty('date')">
+            <template #default="scope">
+                <el-date-picker
+                    @click="stopPropagation($event)"
+                    v-model="scope.row.date"
+                    v-if="checkProperty('edited',scope.$index)"
+                    type="date"
+                    format="DD/MM/YYYY"
+                    value-format="DD/MM/YYYY"
+                    placeholder="Pick a day">
+                </el-date-picker>
+                <!--<el-input v-model="scope.row.date" @click="stopPropagation($event)" type="number" v-if="checkProperty('edited',scope.$index)"></el-input>-->
+                <span v-else>{{scope.row.date}}</span>
+            </template>
+        </el-table-column>
+
         <el-table-column label="" width="200">
             <template #default="scope">
-                <el-button data-id="add_i" v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index) && props.get === 'getFoods'" size="mini" type="success" icon="el-icon-plus" circle @click="addItems()"></el-button>
-                <el-button data-id="add" v-if="!checkProperty('created',scope.$index)" size="mini" type="success" @click="add(scope.$index)">Add</el-button>
+                <el-button data-id="add_i" v-if="(checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index) && props.get === 'getFoods') || props.get === 'getMenus'" size="mini" type="success" icon="el-icon-plus" circle @click="addItems()"></el-button>
+                <el-button data-id="add" v-if="!checkProperty('created',scope.$index) && props.get !== 'getMenuItems'" size="mini" type="success" @click="add(scope.$index)">Add</el-button>
                 <el-button data-id="edit" v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index)" size="mini" type="primary" @click="setEdit($event,scope.$index)">Edit</el-button>
                 <el-button data-id="update" v-if="checkProperty('edited',scope.$index) && checkProperty('created',scope.$index)" size="mini" type="success" @click="update(scope.$index)">Save</el-button>
                 <el-button data-id="delete" v-if="checkProperty('created',scope.$index)" size="mini" type="danger" @click="handleDelete(scope.$index)">Delete</el-button>
@@ -154,6 +178,10 @@
                         data.group_id = itemId.value;
                         type = 'group_id';
                         break;
+                    case 'setFoodIngredient':
+                        data.food_id = itemId.value;
+                        type = 'food_id';
+                        break;
                 }
 
                 if(data.name){
@@ -184,14 +212,17 @@
             const handleChange = (row, column, event) => {
                 if(typeof row.id !== "undefined"){
                     context.emit('category',row.id);
-                    datas.value.map((item,i) => delete datas.value[i].edited);
+                    datas.value.map((item,i) => {
+                        delete datas.value[i].edited
+                    });
+                    datas.value = datas.value.filter((item) => item.name)
                     return 'active-row';
                 }
             };
 
             const foodId = computed(() => props.food);
             const cellClass = (row) => {
-                if(row.row.id === datas.value[0].id && (row.row.id === itemId.value || row.row.id === foodId.value) && ['group','category','food'].includes(row.row.type)){
+                if(row.row.id === datas.value[0].id && (row.row.id === itemId.value || row.row.id === foodId.value) && ['group','category','food','menu'].includes(row.row.type)){
                     return 'active-row-first';
                 }
             }

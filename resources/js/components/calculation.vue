@@ -14,6 +14,7 @@
         <h2>Food and Ingredients</h2>
         <div id="food-list" v-if="groupRows[0].created">
             <dataTable @modal="toggleModal" @loading="setLoading" :loading="loading" :key="foodRows" :get="'getFoods'"
+                       @category="setFood"
                        :add="'setFood'" :update="'updateFood'"
                        :item-id="group"
                        :food="food"
@@ -21,13 +22,14 @@
                        :rows="foodRows">
             </dataTable>
 
-            <modal @modal="toggleModal" :itemId="food" :data="modalFoods" :group="group" :food="foodName"
+            <modal :key="food" @modal="toggleModal" :itemId="food" :type="'group'" :data="modalFoods" :group="group"
                    :dialog="modal"></modal>
 
-            <dataTable id="food-ingredient-list" v-if="food_ingredientRows[0].created" @loading="setLoading"
+            <dataTable id="food-ingredient-list" v-if="food_ingredientRows[0]"
+                       @loading="setLoading"
                        :loading="loading" :key="food_ingredientRows" :get="'getFoodIngredients'"
                        :add="'setFoodIngredient'" :update="'updateFoodIngredient'"
-                       :item-id="group"
+                       :item-id="food"
                        :model="modelFoodIngredients"
                        :rows="food_ingredientRows">
             </dataTable>
@@ -92,8 +94,10 @@
             const foods = computed(() => store.state.foods);
             const categories = computed(() => store.state.categories);
             const ingredients = computed(() => store.state.ingredients);
+
             store.dispatch('getCategories', {});
-            store.dispatch('getIngredients', {category_id: 'all'})
+            store.dispatch('getIngredients', {category_id: 'all'});
+
             const modalFoods = computed(() => ingredients.value.map((item) => {
                 return {
                     children: item.ingredients.map((elem) => {
@@ -111,7 +115,7 @@
 
             let modelFoods = ref({name: '', portions: 0, price_portion: 0, type: 'food', edited: false});
             let foodRows = ref([{...modelFoods.value}]);
-            const food = computed(() => typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null);
+            const food = ref(typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null);
             const foodName = computed(() => typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null);
 
             const fetchFoods = async (group_id) => {
@@ -138,19 +142,12 @@
                 }
             };
 
-            watch(() => group.value,
-                (n, o) => {
+            watch(() => foods.value.length, (n, o) => {
                     if (n !== o) {
-                        fetchFoods(group.value)
+                        food.value = foods.value.length ? (typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null) : null;
+                        foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
                     }
                 }, {immediate: true});
-
-            // watch(() => foods.value.length,
-            //     (n, o) => {
-            //         if (n !== o) {
-            //
-            //         }
-            //     }, {deep: true});
 
 
             //Ingredients
@@ -164,20 +161,25 @@
             });
             let food_ingredientRows = ref([{...modelFoodIngredients.value}]);
 
+            const setFood = (v) => {
+                food.value = v;
+            };
             const fetchFoodIngredients = (food_id) => {
                 if (food_id) {
                     loading.value = true;
                     store.dispatch('getFoodIngredients', {food_id: food_id}).then(() => {
                         loading.value = false;
+                        console.log(food_ingredients)
                         if (food_ingredients.value.length) {
                             console.log(food_ingredients.value.length);
                             food_ingredientRows.value = food_ingredients.value.map((item) => {
                                 return {
                                     id: typeof item.id !== 'undefined' ? item.id : null,
-                                    name: typeof item.name !== 'undefined' ? item.name : '',
+                                    name: typeof item.ingredient.name !== 'undefined' ? item.ingredient.name : '',
                                     food_id: typeof item.food_id !== 'undefined' ? item.food_id : null,
-                                    portions: typeof item.portions !== 'undefined' ? item.portions : 0,
-                                    price_portion: typeof item.price_portion !== 'undefined' ? item.price_portion : 0,
+                                    ingredient_id: typeof item.ingredient_id !== 'undefined' ? item.ingredient_id : null,
+                                    quantity: typeof item.quantity !== 'undefined' ? item.quantity : 0,
+                                    measure: typeof item.ingredient.measure !== 'undefined' ? item.ingredient.measure : 0,
                                     type: 'food_ingredient',
                                     created: true,
                                 }
@@ -186,15 +188,33 @@
                             food_ingredientRows.value = [{...modelFoodIngredients.value}];
                         }
                     });
+                }else {
+                    food_ingredientRows.value = [{...modelFoodIngredients.value}];
                 }
             };
 
             watch(() => group.value,
                 (n, o) => {
                     if (n !== o) {
-                        fetchFoodIngredients(food.value)
+                        fetchFoods(group.value).then(() => {
+                            fetchFoodIngredients(food.value)
+                            food.value =  foods.value.length ? (typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null) : null;
+                            foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
+                        });
                     }
                 }, {immediate: true});
+
+            watch(() => food.value, (n, o) => {
+                    if (n !== o) {
+                        fetchFoodIngredients(food.value)
+                    }
+                });
+
+            watch(() => food_ingredients, (n,o) => {
+                if(n !== o){
+                    fetchFoodIngredients(food.value);
+                }
+            },{deep:true});
 
             // watch(() => foods.value.length,
             //     (n, o) => {
@@ -209,7 +229,7 @@
 
             const toggleModal = (v) => {
                 modal.value = v
-            }
+            };
             return {
                 foods,
                 groups,
@@ -224,12 +244,14 @@
                 foodName,
                 modelFoodIngredients,
                 food_ingredientRows,
+                food_ingredients,
                 categories,
                 loading,
                 setLoading,
                 modal,
                 modalFoods,
-                toggleModal
+                toggleModal,
+                setFood
             }
         }
     })

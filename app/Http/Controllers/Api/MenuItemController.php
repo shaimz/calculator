@@ -17,7 +17,7 @@ class MenuItemController extends Controller
     public function index(Request $request)
     {
         $menu_id = $request->menu_id;
-        return response()->json(MenuItem::where('menu_id',$menu_id)->get());
+        return response()->json(MenuItem::where('menu_id',$menu_id)->with('food')->get());
     }
 
     /**
@@ -39,7 +39,7 @@ class MenuItemController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|max:255'
+            'food_id' => 'required|max:11'
         ]);
 
         $db_data = MenuItem::where('menu_id',$request->menu_id)->where('food_id',$request->food_id)->first();
@@ -51,7 +51,7 @@ class MenuItemController extends Controller
             $item->save();
         }
 
-        return response()->json($item->id ?? ['error' => 'Exists']);
+        return response()->json(MenuItem::where('id',$item->id)->with('food')->first() ?? ['error' => 'Exists']);
     }
 
     /**
@@ -62,7 +62,7 @@ class MenuItemController extends Controller
      */
     public function show($id)
     {
-        return response()->json(MenuItem::where('food_id',$id)->get());
+        return response()->json(MenuItem::where('menu_id',$id)->with('food')->get());
     }
 
     /**
@@ -99,8 +99,13 @@ class MenuItemController extends Controller
      * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $ingredients = $request->foods;
+        foreach($ingredients as $key => $price){
+            if($result = MenuItem::where('food_id',$key)->where('menu_id',$id)) $result->delete();
+        }
+
+        return response()->json();
     }
 }

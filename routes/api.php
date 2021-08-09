@@ -7,6 +7,8 @@ use Api\IngredientController;
 use Api\GroupController;
 use Api\FoodController;
 use Api\FoodIngredientController;
+use Api\MenuController;
+use Api\MenuItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,3 +32,5 @@ Route::resource('ingredient',IngredientController::class);
 Route::resource('group',GroupController::class);
 Route::resource('food',FoodController::class);
 Route::resource('food-ingredient',FoodIngredientController::class);
+Route::resource('menu',MenuController::class);
+Route::resource('menu-item',MenuItemController::class);

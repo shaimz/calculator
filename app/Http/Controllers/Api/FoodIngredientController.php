@@ -19,7 +19,7 @@ class FoodIngredientController extends Controller
     public function index(Request $request)
     {
         $food_id = $request->food_id;
-        return response()->json(FoodIngredient::where('food_id',$food_id)->with('food')->with('ingredient')->get());
+        return response()->json(FoodIngredient::where('food_id', $food_id)->with('food')->with('ingredient')->get());
     }
 
     /**
@@ -35,15 +35,15 @@ class FoodIngredientController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
 
-        foreach($request->ingredients as $id => $quantity){
+        foreach ($request->ingredients as $id => $quantity) {
             $exists = FoodIngredient::where(['food_id' => $request->food_id, 'ingredient_id' => $id])->with('ingredient')->with('food')->first();
-            if(!$exists){
+            if (!$exists) {
                 $foodI = new FoodIngredient();
                 $foodI->ingredient_id = $id;
                 $foodI->food_id = $request->food_id;
@@ -51,7 +51,7 @@ class FoodIngredientController extends Controller
                 $foodI->quantity = $quantity;
                 $foodI->save();
 
-                $response = FoodIngredient::where('id',$foodI->id)->with('food')->with('ingredient')->first();
+                $response = FoodIngredient::where('id', $foodI->id)->with('food')->with('ingredient')->first();
 
                 return response()->json($response);
             }
@@ -66,7 +66,7 @@ class FoodIngredientController extends Controller
      */
     public function show($id)
     {
-        return response()->json(FoodIngredient::where('food_id',$id)->with('food')->with('ingredient')->get());
+        return response()->json(FoodIngredient::where('food_id', $id)->with('food')->with('ingredient')->get());
     }
 
     /**
@@ -83,18 +83,18 @@ class FoodIngredientController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @param  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $ingredients = (array) $request->ingredients;
-        foreach($ingredients as $id => $data){
-           $ingredient = FoodIngredient::where('ingredient_id',$id)->first();
-           $ingredient->quantity = (int) $data;
-           $ingredient->save();
-        }
+        $f_ingredient = FoodIngredient::where('food_id', $id)->first();
+        $f_ingredient->quantity = (int) $request->quantity;
+        $ingredient = Ingredient::find($request->ingredient_id);
+        $ingredient->measure = $request->measure;
+        $ingredient->save();
+        $f_ingredient->save();
 
         return response()->json();
     }
@@ -105,11 +105,11 @@ class FoodIngredientController extends Controller
      * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request,$id)
+    public function destroy(Request $request, $id)
     {
         $ingredients = $request->ingredients;
-        foreach($ingredients as $key => $quantity){
-            if($result = FoodIngredient::where('ingredient_id',$key)->where('food_id',$id)->where('category_id',$request->category_id)) $result->delete();
+        foreach ($ingredients as $key => $quantity) {
+            if ($result = FoodIngredient::where('ingredient_id', $key)->where('food_id', $id)->where('category_id', $request->category_id)) $result->delete();
         }
 
         return response()->json();

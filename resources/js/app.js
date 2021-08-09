@@ -33,7 +33,8 @@ import {
     ElCheckboxGroup,
     ElCheckbox,
     ElCollapse,
-    ElCollapseItem
+    ElCollapseItem,
+    ElDatePicker
 } from 'element-plus';
 
 import ElTransferGroup from '../js/components/transfer/el-transfer-group';
@@ -56,7 +57,8 @@ const components = [
     ElCheckbox,
     ElCollapse,
     ElCollapseItem,
-    ElTransferGroup
+    ElTransferGroup,
+    ElDatePicker
 ];
 
 components.forEach(component => {

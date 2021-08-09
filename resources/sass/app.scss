@@ -12,6 +12,7 @@
 }
 .el-tab-pane[role=tabpanel]{
     display: flex;
+    flex-flow: wrap;
 }
 .el-table__row .cell > span{
     display: block;
@@ -67,7 +68,14 @@
 .el-button.el-button--success[data-id=add_i]{
     padding: 10px;
 }
-.list-group-item.not-draggable{
+.list-group-item.not-draggable {
     -webkit-user-drag: unset;
+}
+.export{
+    flex-basis:100%;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: 20px;
+    margin-top: 20px;
 }
 

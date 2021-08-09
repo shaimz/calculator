@@ -16,7 +16,7 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        return response()->json(Menu::with('food')->get());
+        return response()->json(Menu::with('food.food')->get());
     }
 
     /**
@@ -37,11 +37,11 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        $exists = Menu::where(['food_id' => $request->food_id])->with('food')->first();
+        $exists = Menu::where(['name' => $request->name])->with('food')->first();
         if (!$exists) {
             $menu = new Menu();
             $menu->name = $request->name;
-            $menu->food_id = $request->food_id;
+            $menu->date = $request->date;
             $menu->save();
 
             $response = Menu::where('id', $menu->id)->with('food')->first();
@@ -58,7 +58,7 @@ class MenuController extends Controller
      */
     public function show($id)
     {
-        return response()->json(Menu::where('food_id', $id)->with('food')->with('ingredient')->get());
+        return response()->json(Menu::where('menu_id', $id)->with('food')->get());
     }
 
     /**

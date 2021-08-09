@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\FoodIngredientController;
+use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\UserController;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +26,7 @@ Route::prefix('api')->group(function(){
 });
 
 Route::post('api/food-ingredient/{food_ingredient}',[FoodIngredientController::class,'destroy']);
+Route::post('api/menu-item/{menu_item}',[MenuItemController::class,'destroy']);
 
 
 Route::get('{any}', function () {
