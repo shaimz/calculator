@@ -118,7 +118,9 @@
                     if (evt['removed']) {
                         console.log([this.list2,this.list2.findIndex(item => item.key === evt.removed.element.key)]);
                         // this.list2[this.list2.findIndex(item => item.key === evt.removed.element.key)]['fixed'] = true;
-                        this.$store.dispatch('setFoodIngredient', data)
+                        this.$store.dispatch('setFoodIngredient', data).then(() => {
+                            this.$emit('fetchItems');
+                        })
                     }
                 }else{
                     data['menu_id'] = this.itemId;
@@ -128,7 +130,7 @@
                         // this.list2[this.list2.findIndex(item => item.key === evt.removed.element.key)]['fixed'] = true;
                         this.$store.dispatch('setMenuItem', data).then(() =>{
                             this.price[evt.removed.element.key] = this.rightList[this.rightList.findIndex((el) => el.key === evt.removed.element.key)].price_portion
-                        this.$emit('fetchItems');
+                            this.$emit('fetchItems');
                         })
                     }
                 }
@@ -147,7 +149,9 @@
                         console.log(item)
                         this.list1[this.list1.findIndex(el => el.key === item.category_id)].children.push(item);
                         this.$store.dispatch('getIngredients',{category_id: 'all'});
-                        this.$store.dispatch('getFoodIngredients',{food_id: this.itemId});
+                        this.$store.dispatch('getFoodIngredients',{food_id: this.itemId}).then(() =>{
+                            this.$emit('fetchItems');
+                        });
                     });
                 }else{
                     pair[item.key] = this.price[item.key];
@@ -158,7 +162,9 @@
                         console.log(item);
                         this.list1[this.list1.findIndex(el => el.key === item.group_id)].children.push(item);
                         this.$store.dispatch('getMenus');
-                        this.$store.dispatch('getMenuItems',{menu_id: this.itemId});
+                        this.$store.dispatch('getMenuItems',{menu_id: this.itemId}).then(() =>{
+                            this.$emit('fetchItems');
+                        });
                     });
                 }
 

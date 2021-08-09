@@ -2,7 +2,12 @@
     <div id="categories">
         <h2>Groups</h2>
         <div id="groups-list">
-            <dataTable @loading="setLoading" :loading="loading" :key="groupRows" :get="'getGroups'" :add="'setGroup'"
+            <dataTable @loading="setLoading"
+                       @fetchItems="fetchGroups"
+                       :loading="loading"
+                       :key="groupRows"
+                       :get="'getGroups'"
+                       :add="'setGroup'"
                        :update="'updateGroup'"
                        @category="setGroup"
                        :item-id="group"
@@ -13,22 +18,34 @@
     <div id="ingredients">
         <h2>Food and Ingredients</h2>
         <div id="food-list" v-if="groupRows[0].created">
-            <dataTable @modal="toggleModal" @loading="setLoading" :loading="loading" :key="foodRows" :get="'getFoods'"
+            <dataTable @modal="toggleModal"
+                       @loading="setLoading"
+                       @fetchItems="fetchFoods(group)"
+                       :loading="loading"
+                       :key="foodRows"
+                       :get="'getFoods'"
                        @category="setFood"
-                       :add="'setFood'" :update="'updateFood'"
+                       :add="'setFood'"
+                       :update="'updateFood'"
                        :item-id="group"
                        :food="food"
                        :model="modelFoods"
                        :rows="foodRows">
             </dataTable>
 
-            <modal :key="food" @modal="toggleModal" :itemId="food" :type="'group'" :data="modalFoods" :group="group"
+            <modal @fetchItems="fetchFoodIngredients(food)" :key="food" @modal="toggleModal" :itemId="food" :type="'group'" :data="modalFoods" :group="group"
                    :dialog="modal"></modal>
 
-            <dataTable id="food-ingredient-list" v-if="food_ingredientRows[0]"
+            <dataTable id="food-ingredient-list"
+                       v-if="food_ingredientRows[0]"
                        @loading="setLoading"
-                       :loading="loading" :key="food_ingredientRows" :get="'getFoodIngredients'"
-                       :add="'setFoodIngredient'" :update="'updateFoodIngredient'"
+                       @fetchItems="fetchFoodIngredients(food)"
+                       :loading="loading"
+                       :key="food_ingredientRows"
+                       :get="'getFoodIngredients'"
+                       :add="'setFoodIngredient'"
+                       :update="'updateFoodIngredient'"
+                       :delete="'deleteFoodIngredient'"
                        :item-id="food"
                        :model="modelFoodIngredients"
                        :rows="food_ingredientRows">
@@ -58,7 +75,8 @@
             let modelGroups = ref({name: '', type: 'group', edited: false});
             let groupRows = ref([modelGroups.value]);
             const groups = computed(() => store.state.groups);
-            const group = ref(typeof groups.value[0] !== 'undefined' ? groups.value[0].id : null);
+
+            const group = ref(null);
 
             const fetchGroups = async () => {
                 loading.value = true;
@@ -115,7 +133,7 @@
 
             let modelFoods = ref({name: '', portions: 0, price_portion: 0, type: 'food', edited: false});
             let foodRows = ref([{...modelFoods.value}]);
-            const food = ref(typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null);
+            const food = ref(null);
             const foodName = computed(() => typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null);
 
             const fetchFoods = async (group_id) => {
@@ -135,6 +153,7 @@
                                     created: true,
                                 }
                             })
+                            food.value = foods.value[0].hasOwnProperty('id') && food.value !== foods.value[0].id ? foods.value[0].id : null;
                         } else {
                             foodRows.value = [{...modelFoods.value}];
                         }
@@ -142,12 +161,12 @@
                 }
             };
 
-            watch(() => foods.value.length, (n, o) => {
+            watch(() => foods, (n, o) => {
                     if (n !== o) {
                         food.value = foods.value.length ? (typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null) : null;
                         foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
                     }
-                }, {immediate: true});
+                }, {immediate: true,deep:true});
 
 
             //Ingredients
@@ -171,7 +190,6 @@
                         loading.value = false;
                         console.log(food_ingredients)
                         if (food_ingredients.value.length) {
-                            console.log(food_ingredients.value.length);
                             food_ingredientRows.value = food_ingredients.value.map((item) => {
                                 return {
                                     id: typeof item.id !== 'undefined' ? item.id : null,
@@ -209,12 +227,12 @@
                         fetchFoodIngredients(food.value)
                     }
                 });
-
-            watch(() => food_ingredients, (n,o) => {
-                if(n !== o){
-                    fetchFoodIngredients(food.value);
-                }
-            },{deep:true});
+            //
+            // watch(() => food_ingredients, (n,o) => {
+            //     if(n !== o){
+            //         fetchFoodIngredients(food.value);
+            //     }
+            // },{deep:true});
 
             // watch(() => foods.value.length,
             //     (n, o) => {
@@ -251,7 +269,10 @@
                 modal,
                 modalFoods,
                 toggleModal,
-                setFood
+                setFood,
+                fetchFoodIngredients,
+                fetchFoods,
+                fetchGroups
             }
         }
     })

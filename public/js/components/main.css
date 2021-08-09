@@ -31559,3 +31559,7 @@ h3 {
   margin-bottom: 20px;
   margin-top: 20px;
 }
+
+.active-row {
+  background-color: var(--el-table-current-row-background-color) !important;
+}

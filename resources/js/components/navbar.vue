@@ -10,7 +10,7 @@
             background-color="#545c64"
             text-color="#fff"
             active-text-color="#ffd04b">
-            <el-menu-item :index="item.index" v-for="item in menu">
+            <el-menu-item :index="JSON.stringify(item.index)" v-for="item in menu">
                 <router-link :to="{name:item.text}" class="nav-item nav-link">{{item.text}}</router-link>
             </el-menu-item>
             <el-menu-item index="3"><a class="nav-item nav-link" style="cursor: pointer;"

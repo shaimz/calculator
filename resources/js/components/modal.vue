@@ -1,5 +1,5 @@
 <template>
-    <el-dialog :title="props.type === 'group' ? 'Ingredients' : 'Menu'" v-model="modal">
+    <el-dialog destroy-on-close :title="props.type === 'group' ? 'Ingredients' : 'Menu'" v-model="modal">
 <!--        <el-transfer-->
 <!--            v-model="rightValues"-->
 <!--            style="text-align: left; display: inline-block"-->
@@ -30,7 +30,7 @@
 <!--                &lt;!&ndash;<el-button class="transfer-footer" size="small">Operation</el-button>&ndash;&gt;-->
 <!--            &lt;!&ndash;</template>&ndash;&gt;-->
 <!--        </el-transfer>-->
-        <ElTransferGroup @fetchItems="emitFetch" :itemId="itemId" :name="name" :type="props.type" :price="price" :quantity="quantity" :left-list="left" :right-list="right" v-if="test"/>
+        <ElTransferGroup @fetchItems="emitFetch" :itemId="itemId" :name="name" :type="props.type" :price="price" :quantity="quantity" :left-list="left" :right-list="right" />
     </el-dialog>
 </template>
 
@@ -42,21 +42,18 @@
     export default defineComponent({
         components: {ElTransferGroup},
         props:['dialog','itemId','group','data','reset','name','menu','type'],
-        emits:['modal'],
+        emits:['modal','fetchItems'],
         setup(props, context){
-            console.log('rerender modal')
             const store = useStore();
             const dialog = computed(() => props.dialog);
             const modal = ref(dialog.value);
             const data = computed(() => props.data);
             const name = ref('Mancaruri');
 
-            const test = ref(true);
-
             const itemId = computed(() => props.itemId);
-            const id = toRefs(props).itemId;
             const quantity = ref({});
             const price = ref({});
+
             const checked = ref([]);
             const ingredients = computed(() => store.state.food_ingredients);
             const items = computed(() => store.state.menu_items);
@@ -71,13 +68,14 @@
             // const left = computed(() => {
             //     return data.value.map((el) => el.children.filter((item) => !data.value.some((elem) => elem.key !== item.ingredient_id)))
             // });
-            const left = ref([]);
+
 
             // const left = computed(() => data.value.map((item) => {
             //     let result = {...item};
             //     result.children = item.children.filter((el) => !right.value.some((elem) => elem.key === el.key));
             //     return result;
             // }))
+            const left = ref([]);
             const leftSide = () => {
                 left.value = data.value.map((item) => {
                     let result = {...item};
@@ -160,7 +158,6 @@
                 modal,
                 data,
                 itemId,
-                id,
                 quantity,
                 price,
                 checked,
@@ -169,7 +166,6 @@
                 openDialog,
                 props,
                 name,
-                test,
                 emitFetch
             }
         }

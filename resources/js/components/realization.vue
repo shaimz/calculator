@@ -17,7 +17,7 @@
             <dataTable @modal="toggleModal" @loading="setLoading" :loading="loading" :key="menuItemRows" :get="'getMenuItems'"
                        :add="'setMenuItem'" :update="'updateMenuItem'"
                        :item-id="menu"
-                       :food="food"
+                       :food="item"
                        :model="modelMenuItems"
                        :rows="menuItemRows">
             </dataTable>
@@ -149,6 +149,10 @@
                 axios.post('/api/export',{type:'menus',})
            };
 
+           const setLoading = (v) => {
+               loading.value = v;
+           };
+
            return{
                modelMenus,
                modalMenuItems,
@@ -165,7 +169,8 @@
                setMenu,
                toggleModal,
                fetchItems,
-               exportFile
+               exportFile,
+               setLoading
            }
        }
     })

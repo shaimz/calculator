@@ -107,10 +107,8 @@ class FoodIngredientController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $ingredients = $request->ingredients;
-        foreach ($ingredients as $key => $quantity) {
-            if ($result = FoodIngredient::where('ingredient_id', $key)->where('food_id', $id)->where('category_id', $request->category_id)) $result->delete();
-        }
+        $ingredient = $request->ingredient_id;
+        if ($result = FoodIngredient::where('ingredient_id', $ingredient)->where('food_id', $request->food_id)) $result->delete();
 
         return response()->json();
     }

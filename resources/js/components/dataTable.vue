@@ -3,7 +3,7 @@
     <el-table :key="datas" :data="datas" :row-class-name="cellClass" :lazy="true" v-loading="load" border height="350" style="width:100%;margin-top: 15px;" current-row-key="40" @row-click="handleChange" highlight-current-row>
         <el-table-column labell="" width="50px" v-if="checkProperty('type')">
             <template #default="scope" v-if="['category','group','food','menu'].includes(datas[0].type)">
-                <span v-if="(scope.row.id === itemId && itemId !== 'undefined') || (scope.row.id === food && food !== 'undefined')" class="rounded-circle bg-success active m-auto"></span>
+                <span v-if="scope.row.hasOwnProperty('id') && ((scope.row.id === itemId && itemId !== 'undefined') || (scope.row.id === food && food !== 'undefined'))" class="rounded-circle bg-success active m-auto"></span>
             </template>
         </el-table-column>
         <el-table-column label="Name" width="250" v-if="checkProperty('name')">
@@ -90,8 +90,8 @@
     import {useStore} from 'vuex';
 
     export default defineComponent({
-        props: ['rows','model','itemId','add','get','update','loading','food'],
-        emits:['category','modal'],
+        props: ['rows','model','itemId','add','get','update','loading','food','delete'],
+        emits:['category','modal','loading','fetchItems'],
         setup(props, context) {
             const store = useStore();
             const prop = toRefs(props);
@@ -157,6 +157,7 @@
                                 item.created = true;
                                 delete item.edited;
                             }
+                        context.emit('fetchItems');
                         loading.value = true;
                         store.dispatch(props.get,params).then(() => loading.value = false);
                     });
@@ -190,6 +191,7 @@
                         params[type] = itemId.value;
 
                         loading.value = true;
+                        context.emit('fetchItems');
                         store.dispatch(props.get,params).then(() => {
                             loading.value = false;
                             delete datas.value[index].edited;
@@ -207,11 +209,18 @@
                 e.stopImmediatePropagation();
             };
             const handleDelete = (index) => {
-                datas.value.splice(index, 1);
+                let data = datas.value[index];
+                if(data.id){
+                    store.dispatch(props.delete,data).then(() =>{
+                        datas.value.splice(index, 1);
+                        context.emit('fetchItems');
+                    })
+                }
             };
             const handleChange = (row, column, event) => {
                 if(typeof row.id !== "undefined"){
                     context.emit('category',row.id);
+                    context.emit('fetchItems');
                     datas.value.map((item,i) => {
                         delete datas.value[i].edited
                     });
@@ -225,6 +234,10 @@
                 if(row.row.id === datas.value[0].id && (row.row.id === itemId.value || row.row.id === foodId.value) && ['group','category','food','menu'].includes(row.row.type)){
                     return 'active-row-first';
                 }
+
+                if(itemId.value === row.row.id){
+                    return 'active-row';
+                }
             }
 
             const checkProperty = (property,index = 0) => {
@@ -236,6 +249,14 @@
                 context.emit('modal',true)
             }
 
+            const checkActive = ({ row }) => {
+                if (row.status === 'Appproved') {
+                    return 'success-row'
+                } else if (row.status === 'Rejected') {
+                    return 'warning-row'
+                }
+                return ''
+            }
 
             return {
                 datas,
@@ -255,7 +276,8 @@
                 cellClass,
                 setEdit,
                 stopPropagation,
-                addItems
+                addItems,
+                checkActive
             }
         }
     })
