@@ -33,7 +33,8 @@
                        :rows="foodRows">
             </dataTable>
 
-            <modal @fetchItems="fetchFoodIngredients(food)" :key="food" @modal="toggleModal" :itemId="food" :type="'group'" :data="modalFoods" :group="group"
+            <modal @fetchItems="fetchFoodIngredients(food)" :key="food" @modal="toggleModal" :itemId="food"
+                   :type="'group'" :data="modalFoods" :group="group"
                    :dialog="modal"></modal>
 
             <dataTable id="food-ingredient-list"
@@ -122,7 +123,7 @@
                         return {
                             key: elem.id,
                             name: elem.name,
-                            category_id:elem.category_id
+                            category_id: elem.category_id
                         }
                     }),
                     disabled: false,
@@ -134,7 +135,7 @@
             let modelFoods = ref({name: '', portions: 0, price_portion: 0, type: 'food', edited: false});
             let foodRows = ref([{...modelFoods.value}]);
             const food = ref(null);
-            const foodName = computed(() => typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null);
+            const foodName = ref(null);
 
             const fetchFoods = async (group_id) => {
                 if (group_id) {
@@ -154,6 +155,7 @@
                                 }
                             })
                             food.value = foods.value[0].hasOwnProperty('id') && food.value !== foods.value[0].id ? foods.value[0].id : null;
+                            foodName.value = foods.value[0].hasOwnProperty('id') && food.value !== foods.value[0].id ? foods.value[0].name : null
                         } else {
                             foodRows.value = [{...modelFoods.value}];
                         }
@@ -162,11 +164,10 @@
             };
 
             watch(() => foods, (n, o) => {
-                    if (n !== o) {
-                        food.value = foods.value.length ? (typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null) : null;
-                        foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
-                    }
-                }, {immediate: true,deep:true});
+                if (n !== o) {
+                    foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
+                }
+            }, {immediate: true, deep: true});
 
 
             //Ingredients
@@ -206,27 +207,27 @@
                             food_ingredientRows.value = [{...modelFoodIngredients.value}];
                         }
                     });
-                }else {
+                } else {
                     food_ingredientRows.value = [{...modelFoodIngredients.value}];
                 }
             };
 
-            watch(() => group.value,
+            watch(group,
                 (n, o) => {
-                    if (n !== o) {
-                        fetchFoods(group.value).then(() => {
+                    if(n !== o){
+                        fetchFoods(n).then(() => {
                             fetchFoodIngredients(food.value)
-                            food.value =  foods.value.length ? (typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null) : null;
+                            food.value = foods.value.length ? (typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null) : null;
                             foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
                         });
                     }
                 }, {immediate: true});
 
-            watch(() => food.value, (n, o) => {
-                    if (n !== o) {
-                        fetchFoodIngredients(food.value)
-                    }
-                });
+            watch(food, (n, o) => {
+                if (n !== o) {
+                    fetchFoodIngredients(n)
+                }
+            });
             //
             // watch(() => food_ingredients, (n,o) => {
             //     if(n !== o){
