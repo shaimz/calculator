@@ -220,7 +220,6 @@
             const handleChange = (row, column, event) => {
                 if(typeof row.id !== "undefined"){
                     context.emit('category',row.id);
-                    context.emit('fetchItems');
                     datas.value.map((item,i) => {
                         delete datas.value[i].edited
                     });

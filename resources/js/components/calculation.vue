@@ -154,8 +154,6 @@
                                     created: true,
                                 }
                             })
-                            food.value = foods.value[0].hasOwnProperty('id') && food.value !== foods.value[0].id ? foods.value[0].id : null;
-                            foodName.value = foods.value[0].hasOwnProperty('id') && food.value !== foods.value[0].id ? foods.value[0].name : null
                         } else {
                             foodRows.value = [{...modelFoods.value}];
                         }
