@@ -74,35 +74,38 @@
 <div class="main-container">
     <div class="table-container">
         <h2>Total sum: {{$total}}</h2>
-        @foreach ($categories as $name => $ingredients)
-            <table id="contacts">
-                <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Quantity</th>
-                    <th>Measure</th>
-                    <th>Price</th>
-                </tr>
-                @foreach($ingredients as $ingredient)
-                    @if($ingredient['name'])
+        @foreach ($groups as $group => $foods)
+            @foreach($foods as $food => $ingredients)
+                <table id="contacts">
                     <tr>
-                        <td>{{ $ingredient['id'] }}</td>
-                        <td>{{ $ingredient['name'] }}</td>
-                        <td>{{ $ingredient['quantity'] }}</td>
-                        <td>{{ $ingredient['measure'] }}</td>
-                        <td>{{ $ingredient['price'] }}</td>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Measure</th>
                     </tr>
-                    @endif
-                @endforeach
-                <tr>
-                    <td>Suma: </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>{{$ingredients['total']}}</td>
-                </tr>
-            </table>
-            <h2>{{$name}}</h2>
+
+                    @foreach($ingredients as $ingredient)
+                        @if($ingredient['name'])
+                            <tr>
+                                <td>{{ $ingredient['id'] }}</td>
+                                <td>{{ $ingredient['name'] }}</td>
+                                <td>{{ $ingredient['quantity'] }}</td>
+                                <td>{{ $ingredient['measure'] }}</td>
+                            </tr>
+                        @endif
+                    @endforeach
+
+                    {{--<tr>--}}
+                        {{--<td>Suma:</td>--}}
+                        {{--<td></td>--}}
+                        {{--<td></td>--}}
+                        {{--<td></td>--}}
+                        {{--<td>{{$ingredients['total']}}</td>--}}
+                    {{--</tr>--}}
+                </table>
+                <h2>{{$food}}</h2>
+            @endforeach
+            <h2>{{$group}}</h2>
         @endforeach
     </div>
 </div>

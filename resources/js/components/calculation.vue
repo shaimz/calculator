@@ -74,7 +74,7 @@
 
             //Groups
             let modelGroups = ref({name: '', type: 'group', edited: false});
-            let groupRows = ref([modelGroups.value]);
+            let groupRows = ref([{...modelGroups.value}]);
             const groups = computed(() => store.state.groups);
 
             const group = ref(null);
@@ -214,9 +214,9 @@
                 (n, o) => {
                     if(n !== o){
                         fetchFoods(n).then(() => {
-                            fetchFoodIngredients(food.value)
                             food.value = foods.value.length ? (typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null) : null;
                             foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
+                            fetchFoodIngredients(food.value)
                         });
                     }
                 }, {immediate: true});

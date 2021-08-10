@@ -15,4 +15,5 @@ class Ingredient extends Model
     public function measure(){
 
     }
+
 }

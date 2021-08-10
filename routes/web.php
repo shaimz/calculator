@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ExportPDF;
 use App\Http\Controllers\Api\FoodIngredientController;
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\UserController;
@@ -27,6 +28,8 @@ Route::prefix('api')->group(function(){
 
 Route::post('api/food-ingredient/{food_ingredient}',[FoodIngredientController::class,'destroy']);
 Route::post('api/menu-item/{menu_item}',[MenuItemController::class,'destroy']);
+Route::post('api/export',[ExportPDF::class,'export']);
+Route::post('/pdf',[ExportPDF::class,'index']);
 
 
 Route::get('{any}', function () {

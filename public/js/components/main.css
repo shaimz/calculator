@@ -31487,8 +31487,8 @@ h3 {
     border-color: #dee2e6;
   }
 }
-.active-row-first {
-  background-color: var(--el-table-current-row-background-color) !important;
+.active-first-row {
+  background-color: #e8e9ea !important;
 }
 
 .el-tab-pane[role=tabpanel] {

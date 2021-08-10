@@ -48,7 +48,7 @@ class FoodIngredientController extends Controller
                 $foodI->ingredient_id = $id;
                 $foodI->food_id = $request->food_id;
                 $foodI->category_id = $request->category_id;
-                $foodI->quantity = $quantity;
+                $foodI->quantity = (float) $quantity;
                 $foodI->save();
 
                 $response = FoodIngredient::where('id', $foodI->id)->with('food')->with('ingredient')->first();
@@ -90,7 +90,7 @@ class FoodIngredientController extends Controller
     public function update(Request $request, $id)
     {
         $f_ingredient = FoodIngredient::where('food_id', $id)->first();
-        $f_ingredient->quantity = (int) $request->quantity;
+        $f_ingredient->quantity = (float) $request->quantity;
         $ingredient = Ingredient::find($request->ingredient_id);
         $ingredient->measure = $request->measure;
         $ingredient->save();

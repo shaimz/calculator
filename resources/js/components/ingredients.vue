@@ -11,7 +11,7 @@
     <div id="ingredients">
         <h2>Ingredients</h2>
         <div id="ingredient-list" v-if="categoryRows[0].created">
-            <dataTable @loading="setLoading" :loading="loading" :key="ingredientRows" :get="'getIngredients'" :add="'setIngredient'" :update="'updateIngredient'"
+            <dataTable @loading="setLoading" @fetchItems="fetchIngredients(category)" :loading="loading" :key="ingredientRows" :get="'getIngredients'" :add="'setIngredient'" :update="'updateIngredient'"
                        :item-id="category"
                        :model="modelIngredients"
                        :rows="ingredientRows"></dataTable>
@@ -34,7 +34,7 @@
             const loading = ref(false);
 
             let modelCategories = ref({name: '', type: 'category', edited: false});
-            let categoryRows = ref([modelCategories.value]);
+            let categoryRows = ref([{...modelCategories.value}]);
             const categories = computed(() => store.state.categories);
             const category = ref(typeof categories.value[0] !== 'undefined' ? categories.value.id : null);
 
@@ -74,7 +74,7 @@
 
             const ingredients = computed(() => store.state.ingredients);
             let modelIngredients = ref({name: '', price: 0, measure: 'kg', portions: 0, type: 'ingredient', edited: false});
-            let ingredientRows = ref([modelIngredients.value]);
+            let ingredientRows = ref([{...modelIngredients.value}]);
 
             const fetchIngredients = (category_id) => {
                 if(category_id){
@@ -94,7 +94,7 @@
                                 }
                             })
                         } else {
-                            ingredientRows.value = [modelIngredients.value];
+                            ingredientRows.value = [{...modelIngredients.value}];
                         }
                     });
                 }
@@ -128,7 +128,8 @@
                 setCategory,
                 category,
                 loading,
-                setLoading
+                setLoading,
+                fetchIngredients
             }
         }
     })
