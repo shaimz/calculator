@@ -21,6 +21,9 @@ export const store = createStore({
         async updateIngredient(context, payload){
             await axios.put('/api/ingredient/'+payload.id, payload).then((r) => context.commit('EDIT_INGREDIENT', r.data))
         },
+        async deleteIngredient(context, payload){
+            await axios.post('/api/ingredient/'+payload.id, payload).then((r) => context.commit('EDIT_INGREDIENT', r.data))
+        },
         async getCategories(context, payload){
             await axios.get('/api/category', payload).then((r) => context.commit('GET_CATEGORIES', r.data))
         },
@@ -29,6 +32,9 @@ export const store = createStore({
         },
         async updateCategory(context, payload){
             await axios.put('/api/category/'+payload.id, payload).then((r) => context.commit('EDIT_CATEGORY', r.data))
+        },
+        async deleteCategory(context, payload){
+            await axios.post('/api/category/'+payload.id, payload).then((r) => context.commit('EDIT_CATEGORY', r.data))
         },
         async getGroups(context, payload){
             await axios.get('/api/group', payload).then((r) => context.commit('GET_GROUPS', r.data))
@@ -160,7 +166,7 @@ export const store = createStore({
         },
         ADD_FOOD_INGREDIENT(state, data) {
             console.log(data);
-            let exists = state.food_ingredients.find((i) => i.name === data.food.name);
+            let exists = state.food_ingredients.find((i) => i.food.name === data.food.name);
 
             if (!exists) {
                 let result = {...data};

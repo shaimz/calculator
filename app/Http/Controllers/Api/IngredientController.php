@@ -49,6 +49,7 @@ class IngredientController extends Controller
             $ingredient->name = $request->name;
             $ingredient->category_id = $request->category_id;
             $ingredient->price = $request->price;
+            $ingredient->purchase_price = $request->purchase_price;
             $ingredient->measure = $request->measure;
             $ingredient->save();
         }
@@ -94,6 +95,7 @@ class IngredientController extends Controller
         $ingredient->name = $request->name ?? '';
         $ingredient->measure = $request->measure ?? 'kg';
         $ingredient->price = $request->price ?? 0;
+        $ingredient->purchase_price = $request->purchase_price ?? $request->price;
         $ingredient->save();
 
         return response()->json();
@@ -105,8 +107,9 @@ class IngredientController extends Controller
      * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $ingredient = Ingredient::where('id',$request->id)->first();
+        $ingredient->delete();
     }
 }

@@ -41,20 +41,18 @@ class FoodIngredientController extends Controller
     public function store(Request $request)
     {
 
-        foreach ($request->ingredients as $id => $quantity) {
-            $exists = FoodIngredient::where(['food_id' => $request->food_id, 'ingredient_id' => $id])->with('ingredient')->with('food')->first();
-            if (!$exists) {
-                $foodI = new FoodIngredient();
-                $foodI->ingredient_id = $id;
-                $foodI->food_id = $request->food_id;
-                $foodI->category_id = $request->category_id;
-                $foodI->quantity = (float) $quantity;
-                $foodI->save();
+        $exists = FoodIngredient::where(['food_id' => $request->food_id, 'ingredient_id' => $request->ingredient_id])->with('ingredient')->with('food')->first();
+        if (!$exists) {
+            $foodI = new FoodIngredient();
+            $foodI->ingredient_id = $request->ingredient_id;
+            $foodI->food_id = $request->food_id;
+            $foodI->category_id = $request->category_id;
+            $foodI->quantity = 0;
+            $foodI->save();
 
-                $response = FoodIngredient::where('id', $foodI->id)->with('food')->with('ingredient')->first();
+            $response = FoodIngredient::where('id', $foodI->id)->with('food')->with('ingredient')->first();
 
-                return response()->json($response);
-            }
+            return response()->json($response);
         }
     }
 
@@ -89,12 +87,32 @@ class FoodIngredientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $f_ingredient = FoodIngredient::where('food_id', $id)->first();
-        $f_ingredient->quantity = (float) $request->quantity;
-        $ingredient = Ingredient::find($request->ingredient_id);
-        $ingredient->measure = $request->measure;
-        $ingredient->save();
-        $f_ingredient->save();
+        if ($request->ingredients) {
+            foreach ($request->ingredients as $ingredient => $quantity) {
+                if ($ingredient === 'all') {
+                    $result = [];
+                    $all = FoodIngredient::where('food_id', $request->food_id)->get();
+                    foreach ($all as $it) {
+                        $it->quantity = $quantity;
+                        $it->save();
+                        $result[$it->id] = $quantity;
+                    }
+                    return response()->json();
+                } else {
+                    $food = FoodIngredient::where(['food_id' => $request->food_id, 'ingredient_id' => $ingredient])->first();
+                    $food->quantity = $quantity;
+                    $food->save();
+                }
+            }
+        } else {
+            $f_ingredient = FoodIngredient::where('food_id', $id)->first();
+            $f_ingredient->quantity = (float)$request->quantity;
+            $ingredient = Ingredient::find($request->ingredient_id);
+            $ingredient->measure = $request->measure;
+            $ingredient->save();
+            $f_ingredient->save();
+        }
+
 
         return response()->json();
     }

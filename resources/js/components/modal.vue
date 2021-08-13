@@ -30,7 +30,7 @@
 <!--                &lt;!&ndash;<el-button class="transfer-footer" size="small">Operation</el-button>&ndash;&gt;-->
 <!--            &lt;!&ndash;</template>&ndash;&gt;-->
 <!--        </el-transfer>-->
-        <ElTransferGroup @fetchItems="emitFetch" :itemId="itemId" :name="name" :type="props.type" :price="price" :quantity="quantity" :left-list="left" :right-list="right" />
+        <ElTransferGroup :key="ingredients" @fetchItems="emitFetch" :itemId="itemId" :name="name" :type="props.type" :price="price" :quantity="quantity" :left-list="left" :right-list="right" />
     </el-dialog>
 </template>
 
@@ -60,9 +60,12 @@
 
             const right = computed(() => {
                 if(props.type === 'group'){
-                    return ingredients.value.map((item,index) => {return {key:item.ingredient_id,name:item.ingredient.name,category_id:item.category_id, price_portion:item.food.price_portion,portions:item.food.portions, fixed:true}});
+                    return ingredients.value.map((item,index) => {
+                        if(!item.ingredient.hasOwnProperty('name')) return false;
+                        else return {key:item.ingredient_id,name:item.ingredient.name !== 'undefined' ? item.ingredient.name : '',category_id:item.category_id, price_portion:item.food.price_portion,portions:item.food.portions, fixed:true}
+                    }).filter(it => it);
                 }else{
-                    return items.value.map((item,index) => {return {key:item.food_id,name:item.food.name,price_portion:item.food.price_portion,portions:item.food.portions,menu_id:item.menu_id,group_id:item.group_id, fixed:true}})
+                    return items.value.map((item,index) => {return {key:item.food_id,name:item.food.name,price_portion:item.food.price_portion,portions:item.food.portions,menu_id:item.menu_id,group_id:item.food.group_id, fixed:true}})
                 }
             });
             // const left = computed(() => {
@@ -123,7 +126,7 @@
                         }else{
                             store.dispatch('getMenuItems',{menu_id:itemId.value}).then(() => {
                             console.log(items.value);
-                                items.value.map((item) => price.value[item.food_id] = item.food.price_portion)
+                                items.value.map((item) => price.value[item.food_id] = item.portions)
                             });
                         }
                     }

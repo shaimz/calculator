@@ -81,12 +81,11 @@ class MenuController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $ingredients = (array)$request->ingredients;
-        foreach ($ingredients as $id => $data) {
-            $ingredient = FoodIngredient::where('ingredient_id', $id)->first();
-            $ingredient->quantity = (int)$data;
-            $ingredient->save();
-        }
+        $menu_id = $id;
+        $menu = Menu::where('id', $id)->first();
+        $menu->name = $request->name;
+        $menu->date = $request->date;
+        $menu->save();
 
         return response()->json();
     }

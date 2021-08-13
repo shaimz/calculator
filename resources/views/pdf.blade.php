@@ -40,8 +40,7 @@
         }
 
         .table-container {
-            width: 75%;
-            display: table;
+            width: 100%;
         }
 
         .heading-item a {
@@ -73,8 +72,8 @@
 <body>
 <div class="main-container">
     <div class="table-container">
-        <h2>Total sum: {{$total}}</h2>
         @foreach ($categories as $name => $ingredients)
+            <h2>{{$name}}</h2>
             <table id="contacts">
                 <tr>
                     <th>No</th>
@@ -82,6 +81,7 @@
                     <th>Quantity</th>
                     <th>Measure</th>
                     <th>Price</th>
+                    <th>Purchase Price</th>
                 </tr>
                 @foreach($ingredients as $ingredient)
                     @if($ingredient['name'])
@@ -91,6 +91,7 @@
                         <td>{{ $ingredient['quantity'] }}</td>
                         <td>{{ $ingredient['measure'] }}</td>
                         <td>{{ $ingredient['price'] }}</td>
+                        <td>{{ $ingredient['purchase_price'] }}</td>
                     </tr>
                     @endif
                 @endforeach
@@ -99,11 +100,12 @@
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                     <td>{{$ingredients['total']}}</td>
                 </tr>
             </table>
-            <h2>{{$name}}</h2>
         @endforeach
+            <h2 style="text-align: right; margin-top:20px;">Total sum: {{$total}}</h2>
     </div>
 </div>
 </body>

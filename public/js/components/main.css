@@ -21550,6 +21550,10 @@ h3.title[data-v-71c00dea] {
   max-height: 200px;
   overflow-y: scroll;
 }
+.el-icon-circle-plus[data-v-71c00dea] {
+  font-size: 28px;
+  cursor: pointer;
+}
 /*!***************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/index.js!./node_modules/sass-loader/dist/cjs.js!./resources/sass/app.scss ***!
   \***************************************************************************************************************/
@@ -31562,4 +31566,14 @@ h3 {
 
 .active-row {
   background-color: var(--el-table-current-row-background-color) !important;
+}
+
+.el-dialog__body > .row .col-6 {
+  max-height: 530px;
+  overflow-y: scroll;
+}
+
+.el-transfer-panel .quantity-header .quantity-input {
+  max-width: 60px;
+  margin-right: 10px;
 }

@@ -1,6 +1,7 @@
 <template>
-    <el-button type="success" @click="addRow()" round>Adding row</el-button>
-    <el-table :key="datas" :data="datas" :row-class-name="checkActive" :lazy="true" v-loading="load" border height="350"
+    <el-button type="success" v-if="noButton" @click="addRow()" round>Adding row</el-button>
+    <el-button @click="select">{{selecting ? 'Cancel' : 'Select'}}</el-button>
+    <el-table :id="props.add + '-table'" :class="[noButton ? 'mt-4' : '']" :key="datas" :data="datas" :row-class-name="checkActive" :lazy="true" v-loading="load" border height="350"
               style="width:100%;margin-top: 15px;" current-row-key="40" @row-click="handleChange">
         <el-table-column labell="" width="50px" v-if="checkProperty('type')">
             <template #default="scope" v-if="['category','group','food','menu'].includes(datas[0].type)">
@@ -12,7 +13,7 @@
         <el-table-column label="Name" width="250" v-if="checkProperty('name')">
             <template #default="scope">
                 <span class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
-                <el-input v-model="scope.row.name" type="text" @click="stopPropagation($event)"
+                <el-input v-model="scope.row.name" ref="focus" type="text" @click="stopPropagation($event)"
                           v-if="checkProperty('edited',scope.$index)"></el-input>
                 <span v-else>{{scope.row.name}}</span>
             </template>
@@ -55,6 +56,14 @@
                 <el-input v-model="scope.row.price" @click="stopPropagation($event)"
                           v-if="checkProperty('edited',scope.$index)" type="number"></el-input>
                 <span v-else>{{scope.row.price}}</span>
+            </template>
+        </el-table-column>
+
+        <el-table-column label="Price actual" width="100" v-if="checkProperty('purchase_price')">
+            <template #default="scope">
+                <el-input v-model="scope.row.purchase_price" @click="stopPropagation($event)"
+                          v-if="checkProperty('edited',scope.$index)" type="number"></el-input>
+                <span v-else>{{scope.row.purchase_price}}</span>
             </template>
         </el-table-column>
 
@@ -107,12 +116,12 @@
 </template>
 
 <script>
-    import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted} from 'vue';
+    import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
     import {useStore} from 'vuex';
 
     export default defineComponent({
-        props: ['rows', 'model', 'itemId', 'add', 'get', 'update', 'loading', 'food', 'delete'],
-        emits: ['category', 'modal', 'loading', 'fetchItems'],
+        props: ['rows', 'model', 'itemId', 'add', 'get', 'update', 'loading', 'food', 'delete','noRow'],
+        emits: ['category', 'modal', 'loading', 'fetchItems','categories'],
         setup(props, context) {
             const store = useStore();
             const prop = toRefs(props);
@@ -121,6 +130,10 @@
                 {
                     value: 'kg',
                     label: 'Kg'
+                },
+                {
+                    value: 'buc',
+                    label: 'buc.'
                 },
                 {
                     value: 'g',
@@ -145,6 +158,8 @@
                     context.emit('loading', v)
                 }
             });
+            const focus = ref(null);
+            const selecting = ref(false);
             const itemId = computed(() => props.itemId);
             const food = computed(() => props.food);
             const datas = ref([...props.rows]);
@@ -152,6 +167,10 @@
             const model = reactive({...props.model});
             const addRow = () => {
                 datas.value.push({...model})
+                nextTick(() => {
+                    console.log(focus);
+                    focus.value.focus();
+                });
             };
             const add = (index) => {
                 let data = {...datas.value[index]};
@@ -238,15 +257,24 @@
                     })
                 }
             };
+            const select = () => {
+                selecting.value = !selecting.value;
+                context.emit('selecting',selecting.value);
+            }
             const handleChange = (row, column, event) => {
                 if (typeof row.id !== "undefined") {
-                    loading.value = true;
-                    context.emit('category', row.id);
-                    datas.value.map((item, i) => {
-                        delete datas.value[i].edited
-                    });
-                    datas.value = datas.value.filter((item) => item.name)
-                    loading.value = false;
+                    if(selecting.value){
+                        context.emit('categories',row.id);
+                    }else{
+                        loading.value = true;
+                        context.emit('category', row.id);
+                        datas.value.map((item, i) => {
+                            delete datas.value[i].edited
+                        });
+                        datas.value = datas.value.filter((item) => item.name)
+                        loading.value = false;
+                    }
+
                     return 'active-row';
                 }
             };
@@ -274,13 +302,34 @@
             const checkActive = (scope) => {
                 switch (scope.row.type) {
                     case 'food':
-                        if (scope.row.id === food.value && food.value !== 'undefined') return 'active-first-row';
+                        if (scope.row.id === food.value && food.value !== 'undefined') {
+                            nextTick(() => {
+                                let $container = $('#' + props.add + '-table .el-table__body-wrapper'),
+                                    $scrollTo = $('#' + props.add + '-table .el-table__body-wrapper .active-first-row');
+
+                                $container.scrollTop($scrollTo.offset().top);
+                            });
+                            return 'active-first-row';
+                        }
                         break;
                     default:
-                        if (scope.row.id === itemId.value && itemId.value !== 'undefined') return 'active-first-row';
+                        if (scope.row.id === itemId.value && itemId.value !== 'undefined'){
+                            nextTick(() => {
+                                let $container = $('#' + props.add + '-table .el-table__body-wrapper'),
+                                    $scrollTo = $('#' + props.add + '-table .el-table__body-wrapper .active-first-row');
+
+                                $container.scrollTop($scrollTo.offset().top);
+                            });
+
+                            return 'active-first-row';
+                        }
                         break;
                 }
                 return ''
+            }
+
+            const noButton = () => {
+                return (props.get !== 'getFoodIngredients' && props.get !== 'getMenuItems') && props.noRow === 'undefined'
             }
 
             return {
@@ -292,6 +341,8 @@
                 props,
                 food,
                 error,
+                focus,
+                selecting,
                 addRow,
                 handleDelete,
                 checkProperty,
@@ -299,10 +350,12 @@
                 update,
                 handleChange,
                 cellClass,
+                select,
                 setEdit,
                 stopPropagation,
                 addItems,
-                checkActive
+                checkActive,
+                noButton
             }
         }
     })

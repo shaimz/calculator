@@ -49,7 +49,8 @@
                        :delete="'deleteFoodIngredient'"
                        :item-id="food"
                        :model="modelFoodIngredients"
-                       :rows="food_ingredientRows">
+                       :rows="food_ingredientRows"
+                       :no-row="false">
             </dataTable>
         </div>
     </div>
@@ -148,7 +149,7 @@
                                     id: typeof item.id !== 'undefined' ? item.id : null,
                                     name: typeof item.name !== 'undefined' ? item.name : '',
                                     group_id: typeof item.group_id !== 'undefined' ? item.group_id : null,
-                                    portions: typeof item.portions !== 'undefined' ? item.portions : 0,
+                                    portions: typeof item.portions !== 'undefined' ? item.portions : 1,
                                     price_portion: typeof item.price_portion !== 'undefined' ? item.price_portion : 0,
                                     type: 'food',
                                     created: true,
@@ -190,17 +191,21 @@
                         console.log(food_ingredients)
                         if (food_ingredients.value.length) {
                             food_ingredientRows.value = food_ingredients.value.map((item) => {
-                                return {
-                                    id: typeof item.id !== 'undefined' ? item.id : null,
-                                    name: typeof item.ingredient.name !== 'undefined' ? item.ingredient.name : '',
-                                    food_id: typeof item.food_id !== 'undefined' ? item.food_id : null,
-                                    ingredient_id: typeof item.ingredient_id !== 'undefined' ? item.ingredient_id : null,
-                                    quantity: typeof item.quantity !== 'undefined' ? item.quantity : 0,
-                                    measure: typeof item.ingredient.measure !== 'undefined' ? item.ingredient.measure : 0,
-                                    type: 'food_ingredient',
-                                    created: true,
+                                if(item.ingredient.name){
+                                    return {
+                                        id: typeof item.id !== 'undefined' ? item.id : null,
+                                        name: item.ingredient ? item.ingredient.name : '',
+                                        food_id: typeof item.food_id !== 'undefined' ? item.food_id : null,
+                                        ingredient_id: typeof item.ingredient_id !== 'undefined' ? item.ingredient_id : null,
+                                        quantity: typeof item.quantity !== 'undefined' ? item.quantity : 0,
+                                        measure: item.ingredient ? item.ingredient.measure : 0,
+                                        type: 'food_ingredient',
+                                        created: true,
+                                    }
+                                }else{
+                                    return false
                                 }
-                            })
+                            }).filter((it) => it)
                         } else {
                             food_ingredientRows.value = [{...modelFoodIngredients.value}];
                         }

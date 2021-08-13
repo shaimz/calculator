@@ -81,4 +81,22 @@
 .active-row{
     background-color:var(--el-table-current-row-background-color) !important;
 }
+.el-dialog__body{
+    & > .row{
+        .col-6{
+            max-height: 530px;
+            overflow-y: scroll;
+        }
+    }
+}
+
+.el-transfer-panel{
+    .quantity-header{
+        .quantity-input{
+            max-width: 60px;
+            margin-right: 10px;
+        }
+    }
+}
+
 

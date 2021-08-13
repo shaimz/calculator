@@ -2,7 +2,7 @@
     <div id="categories">
         <h2>Categories</h2>
         <div id="categories-list">
-            <dataTable @loading="setLoading" :loading="loading" :key="categoryRows" :get="'getCategories'" :add="'setCategory'" :update="'updateCategory'"
+            <dataTable @loading="setLoading" :loading="loading" :key="categoryRows" :get="'getCategories'" :add="'setCategory'" :update="'updateCategory'" :delete="'deleteCategory'"
                        @category="setCategory"
                        :item-id="category"
                        :model="modelCategories" :rows="categoryRows"></dataTable>
@@ -11,7 +11,7 @@
     <div id="ingredients">
         <h2>Ingredients</h2>
         <div id="ingredient-list" v-if="categoryRows[0].created">
-            <dataTable @loading="setLoading" @fetchItems="fetchIngredients(category)" :loading="loading" :key="ingredientRows" :get="'getIngredients'" :add="'setIngredient'" :update="'updateIngredient'"
+            <dataTable @loading="setLoading" @fetchItems="fetchIngredients(category)" :loading="loading" :key="ingredientRows" :get="'getIngredients'" :add="'setIngredient'" :update="'updateIngredient'" :delete="'deleteIngredient'"
                        :item-id="category"
                        :model="modelIngredients"
                        :rows="ingredientRows"></dataTable>
@@ -73,7 +73,7 @@
             };
 
             const ingredients = computed(() => store.state.ingredients);
-            let modelIngredients = ref({name: '', price: 0, measure: 'kg', portions: 0, type: 'ingredient', edited: false});
+            let modelIngredients = ref({name: '', price: 0, purchase_price:0, measure: 'kg', portions: 0, type: 'ingredient', edited: false});
             let ingredientRows = ref([{...modelIngredients.value}]);
 
             const fetchIngredients = (category_id) => {
@@ -88,6 +88,7 @@
                                     name: typeof item.name !== 'undefined' ? item.name : '',
                                     category_id: typeof item.category_id !== 'undefined' ? item.category_id : null,
                                     price: typeof item.price !== 'undefined' ? item.price : 0,
+                                    purchase_price: item.purchase_price ? item.purchase_price : item.price,
                                     measure: typeof item.measure !== 'undefined' ? item.measure : 'Kg',
                                     type: 'ingredient',
                                     created: true

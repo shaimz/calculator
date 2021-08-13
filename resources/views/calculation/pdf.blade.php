@@ -40,8 +40,7 @@
         }
 
         .table-container {
-            width: 75%;
-            display: table;
+            width: 100%;
         }
 
         .heading-item a {
@@ -73,9 +72,10 @@
 <body>
 <div class="main-container">
     <div class="table-container">
-        <h2>Total sum: {{$total}}</h2>
         @foreach ($groups as $group => $foods)
-            @foreach($foods as $food => $ingredients)
+            <h2>{{$group}}</h2>
+        @foreach($foods as $food => $ingredients)
+                <h2 class="text-center" style="text-align: center;">{{$food}}</h2>
                 <table id="contacts">
                     <tr>
                         <th>No</th>
@@ -103,9 +103,7 @@
                         {{--<td>{{$ingredients['total']}}</td>--}}
                     {{--</tr>--}}
                 </table>
-                <h2>{{$food}}</h2>
             @endforeach
-            <h2>{{$group}}</h2>
         @endforeach
     </div>
 </div>

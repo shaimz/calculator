@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Food;
 use App\Models\MenuItem;
 use Illuminate\Http\Request;
 
@@ -48,6 +49,7 @@ class MenuItemController extends Controller
             $item = new MenuItem();
             $item->food_id = $request->food_id;
             $item->menu_id = $request->menu_id;
+            $item->portions = 1;
             $item->save();
         }
 
@@ -85,11 +87,26 @@ class MenuItemController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $item = MenuItem::find($id);
-        $item->food_id = $request->food_id ?? 0;
-        $item->menu_id = $request->menu_id ?? 0;
-        $item->save();
+        if(!empty($request->portions->all)){
+            foreach($request->portions as $food_id => $portion){
+                if($food_id === 'all'){
+                    $items = MenuItem::where('menu_id', $id)->get();
+                    foreach($items as $item){
+                        $item->portions = $portion ?? 1;
+                        $item->save();
+                    }
+                }
 
+            }
+        }else{
+            $items = MenuItem::where(['menu_id' => $id,'food_id' => $request->food_id])->get();
+            foreach($items as $item){
+                $item->food_id = $request->food_id ?? 0;
+                $item->menu_id = $request->menu_id ?? 0;
+                $item->portions = $request->portions ?? 1;
+                $item->save();
+            }
+        }
         return response()->json();
     }
 

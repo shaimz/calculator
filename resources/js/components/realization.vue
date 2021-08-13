@@ -6,22 +6,27 @@
                        :add="'setMenu'"
                        :update="'updateMenu'"
                        @category="setMenu"
+                       @categories="setMenus"
+                       @selecting="select"
                        :item-id="menu"
-                       :model="modelMenus" :rows="menuRows">
+                       :model="modelMenus"
+                       :rows="menuRows">
             </dataTable>
         </div>
     </div>
 
     <div id="ingredients">
         <h2>Menu Foods</h2>
-        <div id="food-list" v-if="menuRows[0].created">
+        <div id="food-list" v-if="menuRows[0].created" >
             <dataTable @modal="toggleModal" @loading="setLoading" :loading="loading" :key="menuItemRows"
                        :get="'getMenuItems'"
-                       :add="'setMenuItem'" :update="'updateMenuItem'"
+                       :add="'setMenuItem'"
+                       :update="'updateMenuItem'"
                        :item-id="menu"
                        :food="item"
                        :model="modelMenuItems"
-                       :rows="menuItemRows">
+                       :rows="menuItemRows"
+                       :no-row="false">
             </dataTable>
 
             <modal @fetchItems="fetchItems(menu)" @modal="toggleModal" :itemId="menu" :type="'menu'"
@@ -29,9 +34,11 @@
                    :dialog="modal"></modal>
         </div>
     </div>
-    <el-button class="export container text-center" size="large" type="primary" @click="exportFile">Export Ingredients
+    <el-button class="export container text-center" size="large" type="primary" @click="exportFile('ingredients')">Export Ingredients
     </el-button>
     <el-button class="export container text-center" size="large" type="primary" @click="exportFile('calculation')">Export calculator
+    </el-button>
+    <el-button class="export container text-center" size="large" type="primary" @click="exportFile('menu')">Export menu
     </el-button>
 </template>
 
@@ -52,6 +59,7 @@
             let menuRows = ref([modelMenus.value]);
             const menus = computed(() => store.state.menus);
             const menu = ref(typeof menus.value[0] !== 'undefined' ? menus.value[0].id : null);
+            const menuList = ref([]);
 
             const fetchMenus = async () => {
                 loading.value = true;
@@ -83,6 +91,14 @@
             const setMenu = (val) => {
                 menu.value = val;
             };
+            const setMenus = (val) => {
+                if(menuList.value.length) {
+                    if(menuList.value.find(i => i === val)) menuList.value = menuList.value.filter(i => i !== val);
+                    else menuList.value.push(val);
+                }else{
+                   menuList.value.push(val);
+                }
+            }
 
             //Items
             const foods = computed(() => store.state.foods);
@@ -129,7 +145,7 @@
                                     food_id: typeof item.food_id !== 'undefined' ? item.food_id : null,
                                     group_id: typeof item.food.group_id !== 'undefined' ? item.food.group_id : null,
                                     price_portion: typeof item.food.price_portion !== 'undefined' ? item.food.price_portion : 0,
-                                    portions: typeof item.food.portions !== 'undefined' ? item.food.portions : 0,
+                                    portions: typeof item.portions !== 'undefined' ? item.portions : 1,
                                     type: 'food',
                                 }
                             })
@@ -151,22 +167,24 @@
                 modal.value = v
             };
 
-            const exportFile = (type = 'ingredients') => {
-                axios.post('/api/export', {type: type, menu_id: menu.value},{
+            const exportFile = (type) => {
+                let data = {type: type, menu_id: menu.value};
+                if(selecting.value) data = {type: type, menu_id: menuList.value};
+                axios.post('/api/export', data,{
                     responseType: 'arraybuffer',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/pdf'
                     }
                 }).then((r) => {
-                    downloadFile(r.data)
+                     downloadFile(r.data,type)
                 })
             };
 
             const setLoading = (v) => {
                 loading.value = v;
             };
-            const downloadFile = (response) => {
+            const downloadFile = (response,type) => {
                 try {
                     var file = new File([response], filename, {type: "text/plain"});
                 } catch (e) {
@@ -174,10 +192,14 @@
                 }
                 let link = document.createElement('a');
                 link.href = window.URL.createObjectURL(file);
-                link.download = 'test.pdf';
+                link.download = type + '.pdf';
                 link.click()
             };
 
+            const selecting = ref(false);
+            const select = (v) => {
+                selecting.value = v;
+            }
 
             return {
                 modelMenus,
@@ -190,13 +212,17 @@
                 modal,
                 menuItemRows,
                 modelMenuItems,
+                menuList,
                 item,
                 itemName,
+                selecting,
                 setMenu,
                 toggleModal,
                 fetchItems,
                 exportFile,
-                setLoading
+                setLoading,
+                setMenus,
+                select
             }
         }
     })
