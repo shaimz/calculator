@@ -81,14 +81,24 @@ class ExportPDF extends Controller
                 }
                 foreach ($items as $item) {
                     $food_ingredient = FoodIngredient::where('food_id', $item->food_id)->with('food.group')->with(['ingredient', 'category'])->get();
-                    $total = 0;
                     foreach ($food_ingredient as $fi) {
-                        $categories[$fi->food->group->name][$fi->food->name . ' - ' . $fi->food->portions . 'p.'][] = ['id' => $i, 'name' => $fi->ingredient->name, 'price' => $fi->ingredient->price, 'quantity' => $fi->quantity, 'measure' => $fi->ingredient->measure];
-//                        $total += $fi->ingredient->price;
-//                        $categories[$fi->category->name]['total'] = $total;
-                        $i++;
+                        $process = true;
+                        var_export($fi->food->name);
+                        if (!empty($categories[$fi->category->name][$fi->food->name . ' - ' . $fi->food->portions . 'p.'])) {
+                            foreach ($categories[$fi->category->name][$fi->food->name . ' - ' . $fi->food->portions . 'p.'] as $index => $obj) {
+                                if (($obj['name'] === $fi->ingredient->name)) {
+                                    $categories[$fi->category->name][$fi->food->name . ' - ' . $fi->food->portions . 'p.'][$index]['quantity'] += $fi->quantity;
+                                    $process = false;
+//                                    var_export([$categories[$fi->food->group->name][$fi->food->name . ' - ' . $fi->food->portions . 'p.'][$index],$obj]);
+                                }
+                            }
+                        }
+
+                        if ($process) {
+                            $categories[$fi->food->group->name][$fi->food->name . ' - ' . $fi->food->portions . 'p.'][] = ['id' => $i, 'name' => $fi->ingredient->name, 'price' => $fi->ingredient->price, 'quantity' => $fi->quantity, 'measure' => $fi->ingredient->measure];
+                            $i++;
+                        }
                     }
-//                    $sum += $total;
                 }
 
                 $pdf = PDF::loadView('calculation.pdf', ['groups' => $categories, 'total' => $sum]);

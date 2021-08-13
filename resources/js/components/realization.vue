@@ -177,7 +177,7 @@
                         'Accept': 'application/pdf'
                     }
                 }).then((r) => {
-                     downloadFile(r.data,type)
+                     // downloadFile(r.data,type)
                 })
             };
 
