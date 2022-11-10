@@ -20,7 +20,7 @@
         <div id="food-list" v-if="groupRows[0].created">
             <dataTable @modal="toggleModal"
                        @loading="setLoading"
-                       @fetchItems="fetchFoods(group)"
+                       @fetchItems="fetchFoods()"
                        :loading="loading"
                        :key="foodRows"
                        :get="'getFoods'"
@@ -77,6 +77,14 @@
         edited: false
     }
 
+    const modelFoodIngredients = {
+        name: '',
+        portions: 0,
+        price_portion: 0,
+        type: 'food_ingredient',
+        edited: false
+    }
+
     export default defineComponent({
         components: {
             dataTable,
@@ -95,16 +103,9 @@
 
             const fetchGroups = async () => {
                 loading.value = true
-                let result = await store.fetchGroups()
+                groupRows.value = await store.fetchGroups()
                 loading.value = false
-                groupRows.value = result.map((item) => {
-                    return {
-                        ...item,
-                        type: 'group',
-                        created: true,
-                    }
-                });
-                if (result.length && !store.activeGroup) store.setActiveGroup(result[0].id)
+                if (result.length && !store.activeGroup) store.setActiveGroup(groupRows.value[0].id)
             }
             fetchGroups()
 
@@ -137,100 +138,20 @@
 
             const fetchFoods = async () => {
                 loading.value = true;
-                let result = await store.fetchFoods()
+                foodRows.value = await store.fetchFoods()
+                foodName.value = result[0]?.name
                 loading.value = false;
-
-                foodRows.value = result.map((item) => {
-                    return {
-                        ...item,
-                        type: 'food',
-                        created: true,
-                    }
-                })
             };
-
-            watch(() => foods, (n, o) => {
-                if (n !== o) {
-                    foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
-                }
-            }, {immediate: true, deep: true});
-
 
             //Ingredients
-            const food_ingredients = computed(() => store.state.food_ingredients);
-            let modelFoodIngredients = ref({
-                name: '',
-                portions: 0,
-                price_portion: 0,
-                type: 'food_ingredient',
-                edited: false
-            });
-            let food_ingredientRows = ref([{...modelFoodIngredients.value}]);
+            const food_ingredients = computed(() => store.food_ingredients);
+            let food_ingredientRows = ref([{ ...modelFoodIngredients }]);
 
-            const setFood = (v) => {
-                food.value = v;
+            const fetchFoodIngredients = async () => {
+                loading.value = true;
+                food_ingredientRows.value = await store.fetchFoodIngredients()
+                loading.value = false;
             };
-            const fetchFoodIngredients = (food_id) => {
-                if (food_id) {
-                    loading.value = true;
-                    store.dispatch('getFoodIngredients', {food_id: food_id}).then(() => {
-                        loading.value = false;
-                        console.log(food_ingredients)
-                        if (food_ingredients.value.length) {
-                            food_ingredientRows.value = food_ingredients.value.map((item) => {
-                                if(item.ingredient.name){
-                                    return {
-                                        id: typeof item.id !== 'undefined' ? item.id : null,
-                                        name: item.ingredient ? item.ingredient.name : '',
-                                        food_id: typeof item.food_id !== 'undefined' ? item.food_id : null,
-                                        ingredient_id: typeof item.ingredient_id !== 'undefined' ? item.ingredient_id : null,
-                                        quantity: typeof item.quantity !== 'undefined' ? item.quantity : 0,
-                                        measure: item.ingredient ? item.ingredient.measure : 0,
-                                        type: 'food_ingredient',
-                                        created: true,
-                                    }
-                                }else{
-                                    return false
-                                }
-                            }).filter((it) => it)
-                        } else {
-                            food_ingredientRows.value = [{...modelFoodIngredients.value}];
-                        }
-                    });
-                } else {
-                    food_ingredientRows.value = [{...modelFoodIngredients.value}];
-                }
-            };
-
-            watch(group,
-                (n, o) => {
-                    if(n !== o){
-                        fetchFoods(n).then(() => {
-                            food.value = foods.value.length ? (typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null) : null;
-                            foodName.value = typeof foods.value[0] !== 'undefined' ? foods.value[0].name : null
-                            fetchFoodIngredients(food.value)
-                        });
-                    }
-                }, {immediate: true});
-
-            watch(food, (n, o) => {
-                if (n !== o) {
-                    fetchFoodIngredients(n)
-                }
-            });
-            //
-            // watch(() => food_ingredients, (n,o) => {
-            //     if(n !== o){
-            //         fetchFoodIngredients(food.value);
-            //     }
-            // },{deep:true});
-
-            // watch(() => foods.value.length,
-            //     (n, o) => {
-            //         if (n !== o) {
-            //             foodRows
-            //         }
-            //     }, {deep: true});
 
             const setLoading = (v) => {
                 loading.value = v;

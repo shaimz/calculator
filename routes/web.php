@@ -25,10 +25,10 @@ Route::prefix('api')->group(function(){
     Route::post('register', [UserController::class, 'register']);
     Route::get('logout', [UserController::class, 'logout'])->middleware('auth');
     //Delete items
-    Route::post('food-ingredient',[FoodIngredientController::class,'destroy']);
-    Route::post('menu-item',[MenuItemController::class,'destroy']);
-    Route::post('ingredient',[Ingredient::class,'destroy']);
-    Route::post('category',[Category::class,'destroy']);
+    Route::delete('food-ingredient',[FoodIngredientController::class,'destroy']);
+    Route::delete('menu-item',[MenuItemController::class,'destroy']);
+    Route::delete('ingredient',[Ingredient::class,'destroy']);
+    Route::delete('category',[Category::class,'destroy']);
 
     Route::post('export',[ExportPDF::class,'export']);
 });

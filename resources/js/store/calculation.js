@@ -11,7 +11,14 @@ export const useCalculationStore = defineStore("calculation", {
   }),
   actions: {
     async fetchGroups(){
-      return await axios.get('/api/group').then((r) => r.data)
+      let result = await axios.get('/api/group').then((r) => r.data)
+      return result.map((item) => {
+        return {
+            ...item,
+            type: 'group',
+            created: true,
+        }
+      });
     },
     async addGroup(data){
         await axios.post('/api/group', data).then((r) => {
@@ -26,12 +33,21 @@ export const useCalculationStore = defineStore("calculation", {
     async updateGroup(context, payload){
         await axios.put('/api/group/'+payload.id, payload).then((r) => context.commit('EDIT_GROUP', r.data))
     },
-    setActiveGroup(id) {
+    async setActiveGroup(id) {
       if (id == this.activeGroup) return
       this.activeGroup = id
+      await this.fetchFoods()
     },
     async fetchFoods(){
-        return await axios.get(`/api/food/${this.activeGroup}`).then((r) => r.data)
+      let result = await axios.get(`/api/food/${this.activeGroup}`).then((r) => r.data)
+      await this.fetchFoodIngredients()
+      return result.map((item) => {
+        return {
+            ...item,
+            type: 'food',
+            created: true,
+        }
+      })
     },
     async setActiveFood(id){
       if (this.activeFood == id) return
@@ -42,8 +58,16 @@ export const useCalculationStore = defineStore("calculation", {
     async updateFood(context, payload){
         await axios.put('/api/food/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD', r.data))
     },
-    async getFoodIngredients(context, payload = 0){
-        await axios.get('/api/food-ingredient/' + payload.food_id).then((r) => context.commit('GET_FOOD_INGREDIENTS', r.data))
+    async fetchFoodIngredients(){
+        let result = await axios.get(`/api/food-ingredient/${this.activeFood}`).then((r) => r.data)
+        return result.map((item) => {
+          if(!item.ingredient.name) return {}
+              return {
+                 ...item,
+                  type: 'food_ingredient',
+                  created: true,
+              }
+      })
     },
     async setFoodIngredient(context, payload){
         await axios.post('/api/food-ingredient', payload).then((r) => context.commit('ADD_FOOD_INGREDIENT', r.data))

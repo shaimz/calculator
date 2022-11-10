@@ -75,7 +75,6 @@
             const fetchCategories = async () => {
                 loading.value = true;
                 let result = await store.fetchCategories()
-                console.log('result', result)
                 categoryRows.value = result.map((category) => {
                     return {
                         id: category.id,
