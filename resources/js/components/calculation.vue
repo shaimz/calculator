@@ -69,6 +69,14 @@
         edited: false
     }
 
+    const modelFoods = {
+        name: '',
+        portions: 0,
+        price_portion: 0,
+        type: 'food',
+        edited: false
+    }
+
     export default defineComponent({
         components: {
             dataTable,
@@ -96,7 +104,7 @@
                         created: true,
                     }
                 });
-                if (result.length && !store.activeGroup) setActiveGroup(result[0].id)
+                if (result.length && !store.activeGroup) store.setActiveGroup(result[0].id)
             }
             fetchGroups()
 
@@ -106,7 +114,7 @@
             const ingredients = computed(() => iStore.ingredients);
 
             iStore.fetchCategories()
-            store.dispatch('getIngredients', {category_id: 'all'});
+            iStore.fetchIngredients()
 
             const modalFoods = computed(() => ingredients.value.map((item) => {
                 return {
@@ -123,33 +131,22 @@
                 }
             }));
 
-            let modelFoods = ref({name: '', portions: 0, price_portion: 0, type: 'food', edited: false});
-            let foodRows = ref([{...modelFoods.value}]);
-            const food = ref(null);
+            let foodRows = ref([{ ...modelFoods }]);
+            const food = computed(() => store.activeFood);
             const foodName = ref(null);
 
-            const fetchFoods = async (group_id) => {
-                if (group_id) {
-                    loading.value = true;
-                    await store.dispatch('getFoods', {group_id: group_id}).then(() => {
-                        loading.value = false;
-                        if (foods.value.length) {
-                            foodRows.value = foods.value.map((item) => {
-                                return {
-                                    id: typeof item.id !== 'undefined' ? item.id : null,
-                                    name: typeof item.name !== 'undefined' ? item.name : '',
-                                    group_id: typeof item.group_id !== 'undefined' ? item.group_id : null,
-                                    portions: typeof item.portions !== 'undefined' ? item.portions : 1,
-                                    price_portion: typeof item.price_portion !== 'undefined' ? item.price_portion : 0,
-                                    type: 'food',
-                                    created: true,
-                                }
-                            })
-                        } else {
-                            foodRows.value = [{...modelFoods.value}];
-                        }
-                    });
-                }
+            const fetchFoods = async () => {
+                loading.value = true;
+                let result = await store.fetchFoods()
+                loading.value = false;
+
+                foodRows.value = result.map((item) => {
+                    return {
+                        ...item,
+                        type: 'food',
+                        created: true,
+                    }
+                })
             };
 
             watch(() => foods, (n, o) => {

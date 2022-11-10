@@ -4,6 +4,7 @@ import { defineStore } from 'pinia'
 export const useCalculationStore = defineStore("calculation", {
   state: () => ({
     activeGroup: null,
+    activeFood: null,
     groups: [],
     foods: [],
     food_ingredients: [],
@@ -29,11 +30,14 @@ export const useCalculationStore = defineStore("calculation", {
       if (id == this.activeGroup) return
       this.activeGroup = id
     },
-    async getFoods(context, payload = 0){
-        await axios.get('/api/food/' + payload.group_id).then((r) => context.commit('GET_FOODS', r.data))
+    async fetchFoods(){
+        return await axios.get(`/api/food/${this.activeGroup}`).then((r) => r.data)
     },
-    async setFood(context, payload){
-        await axios.post('/api/food', payload).then((r) => context.commit('ADD_FOOD', r.data))
+    async setActiveFood(id){
+      if (this.activeFood == id) return
+      this.activeFood = id
+      return
+      await axios.post('/api/food', payload).then((r) => context.commit('ADD_FOOD', r.data))
     },
     async updateFood(context, payload){
         await axios.put('/api/food/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD', r.data))
