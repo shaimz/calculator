@@ -18,6 +18,7 @@ class CreateIngredientsTable extends Migration
             $table->integer('category_id');
             $table->string('name');
             $table->integer('price');
+            $table->integer('purchase_price');
             $table->string('measure');
         });
     }

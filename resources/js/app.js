@@ -2,6 +2,7 @@ import axios from 'axios';
 import {createApp} from 'vue';
 import router from './router/router'
 import { store } from './store/store';
+import { createPinia } from 'pinia'
 import 'element-plus/lib/theme-chalk/index.css';
 
 const app = createApp({});
@@ -75,6 +76,7 @@ app.use(vClickOutside);
 
 app.use(router);
 app.use(store);
+app.use(createPinia())
 app.component('master',master);
 app.provide('$axios',axios);
 app.mount('#app');

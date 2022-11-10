@@ -24,14 +24,15 @@ Route::prefix('api')->group(function(){
     Route::post('login', [UserController::class, 'login']);
     Route::post('register', [UserController::class, 'register']);
     Route::get('logout', [UserController::class, 'logout'])->middleware('auth');
+    //Delete items
+    Route::post('food-ingredient',[FoodIngredientController::class,'destroy']);
+    Route::post('menu-item',[MenuItemController::class,'destroy']);
+    Route::post('ingredient',[Ingredient::class,'destroy']);
+    Route::post('category',[Category::class,'destroy']);
 
+    Route::post('export',[ExportPDF::class,'export']);
 });
 
-Route::post('api/food-ingredient/{food_ingredient}',[FoodIngredientController::class,'destroy']);
-Route::post('api/menu-item/{menu_item}',[MenuItemController::class,'destroy']);
-Route::post('api/ingredient/{ingredient}',[Ingredient::class,'destroy']);
-Route::post('api/category/{category}',[Category::class,'destroy']);
-Route::post('api/export',[ExportPDF::class,'export']);
 Route::post('/pdf',[ExportPDF::class,'index']);
 
 

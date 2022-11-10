@@ -2,118 +2,93 @@
     <div id="categories">
         <h2>Categories</h2>
         <div id="categories-list">
-            <dataTable @loading="setLoading" :loading="loading" :key="categoryRows" :get="'getCategories'" :add="'setCategory'" :update="'updateCategory'" :delete="'deleteCategory'"
-                       @category="setCategory"
-                       :item-id="category"
-                       :model="modelCategories" :rows="categoryRows"></dataTable>
+            <dataTable
+                :loading="loading"
+                :key="categoryRows"
+                :get="'fetchCategories'"
+                :add="'addCategory'"
+                :update="'updateCategory'"
+                :delete="'deleteCategory'"
+                :item-id="category"
+                :model="modelCategory"
+                :rows="categoryRows"
+                @category="setActiveCategory"
+                @loading="setLoading"
+            ></dataTable>
         </div>
     </div>
     <div id="ingredients">
         <h2>Ingredients</h2>
         <div id="ingredient-list" v-if="categoryRows[0].created">
-            <dataTable @loading="setLoading" @fetchItems="fetchIngredients(category)" :loading="loading" :key="ingredientRows" :get="'getIngredients'" :add="'setIngredient'" :update="'updateIngredient'" :delete="'deleteIngredient'"
-                       :item-id="category"
-                       :model="modelIngredients"
-                       :rows="ingredientRows"></dataTable>
+            <dataTable
+                :loading="loading"
+                :key="ingredients"
+                :get="'fetchIngredients'"
+                :add="'addIngredient'"
+                :update="'updateIngredient'"
+                :delete="'deleteIngredient'"
+                :item-id="category"
+                :model="modelIngredient"
+                :rows="ingredients"
+                @loading="setLoading"
+                @fetchItems="store.fetchIngredients()"
+            ></dataTable>
         </div>
     </div>
 </template>
 
 <script>
     import {defineComponent, ref, computed, watch, onMounted} from 'vue';
-    import {useStore} from 'vuex';
+    import { useIngredientStore } from '../store/ingredients'
     import dataTable from '../components/dataTable.vue';
 
+    const modelCategory = {
+        name: '',
+        type: 'category',
+        edited: false
+    }
+
+    const modelIngredient = {
+        name: '',
+        price: 0,
+        purchase_price:0,
+        measure: 'kg',
+        portions: 0,
+        type: 'ingredient',
+        edited: false
+    }
     export default defineComponent({
         components: {
             dataTable
         },
         setup() {
-            const store = useStore();
+            const store = useIngredientStore()
+            const setActiveCategory = (id) => store.setActiveCategory(id)
 
             const loading = ref(false);
 
-            let modelCategories = ref({name: '', type: 'category', edited: false});
-            let categoryRows = ref([{...modelCategories.value}]);
-            const categories = computed(() => store.state.categories);
-            const category = ref(typeof categories.value[0] !== 'undefined' ? categories.value.id : null);
+            let ingredients = computed(() => store.ingredients)
+            let categoryRows = ref([{ ...modelCategory }]);
+
+            const category = computed(() => store.activeCategory);
 
             const fetchCategories = async () => {
                 loading.value = true;
-                await store.dispatch('getCategories').then(() => {
-                    loading.value = false;
-                    if (categories.value.length) {
-                        categoryRows.value = categories.value.map((item) => {
-                            return {
-                                id: typeof item.id !== 'undefined' ? item.id : null,
-                                name: typeof item.name !== 'undefined' ? item.name : '',
-                                type: 'category',
-                                created: true
-                            }
-                        });
+                let result = await store.fetchCategories()
+                console.log('result', result)
+                categoryRows.value = result.map((category) => {
+                    return {
+                        id: category.id,
+                        name: category.name || '',
+                        type: 'category',
+                        created: true
                     }
-                });
-            };
+                })
+                if (result.length && !store.activeCategory) setActiveCategory(result[0].id)
+                loading.value = false
+            }
 
-            onMounted(() => {
-
-            });
-
-            watch(() => categories.value.length,
-                (n, o) => {
-                    if (n !== o) {
-                        fetchCategories().then(() => {
-                            category.value = categories.value.length ? (categories.value[0].hasOwnProperty('id') ? categories.value[0].id : null) : null;
-                        });
-                    }
-                }, {immediate: true});
-
-            const setCategory = (val) => {
-                category.value = val;
-            };
-
-            const ingredients = computed(() => store.state.ingredients);
-            let modelIngredients = ref({name: '', price: 0, purchase_price:0, measure: 'kg', portions: 0, type: 'ingredient', edited: false});
-            let ingredientRows = ref([{...modelIngredients.value}]);
-
-            const fetchIngredients = (category_id) => {
-                if(category_id){
-                    loading.value = true;
-                    store.dispatch('getIngredients', {category_id: category_id}).then(() => {
-                        loading.value = false;
-                        if (ingredients.value.length) {
-                            ingredientRows.value = ingredients.value.map((item) => {
-                                return {
-                                    id: typeof item.id !== 'undefined' ? item.id : null,
-                                    name: typeof item.name !== 'undefined' ? item.name : '',
-                                    category_id: typeof item.category_id !== 'undefined' ? item.category_id : null,
-                                    price: typeof item.price !== 'undefined' ? item.price : 0,
-                                    purchase_price: item.purchase_price ? item.purchase_price : item.price,
-                                    measure: typeof item.measure !== 'undefined' ? item.measure : 'Kg',
-                                    type: 'ingredient',
-                                    created: true
-                                }
-                            })
-                        } else {
-                            ingredientRows.value = [{...modelIngredients.value}];
-                        }
-                    });
-                }
-            };
-
-            watch(() => category.value,
-                (n, o) => {
-                    if (n !== o) {
-                        fetchIngredients(category.value)
-                    }
-                }, {immediate: true});
-
-            // watch(() => ingredients.value.length,
-            //     (n, o) => {
-            //         if (n !== o) {
-            //             fetchIngredients(category.value)
-            //         }
-            //     }, {deep: true});
+            fetchCategories()
 
             const setLoading = (v) => {
                 loading.value = v;
@@ -121,16 +96,14 @@
 
             return {
                 ingredients,
-                categories,
-                ingredientRows,
                 categoryRows,
-                modelIngredients,
-                modelCategories,
-                setCategory,
+                modelCategory,
+                modelIngredient,
                 category,
+                setActiveCategory,
                 loading,
                 setLoading,
-                fetchIngredients
+                store
             }
         }
     })

@@ -3,69 +3,10 @@ import {createStore} from 'vuex'
 // Create a new store instance.
 export const store = createStore({
     state: {
-        ingredients: [],
-        categories: [],
-        groups: [],
-        foods: [],
-        food_ingredients: [],
         menus:[],
         menu_items:[]
     },
     actions: {
-        async getIngredients(context, payload = 0){
-            await axios.get('/api/ingredient/' + payload.category_id).then((r) => context.commit('GET_INGREDIENTS', r.data))
-        },
-        async setIngredient(context, payload){
-            await axios.post('/api/ingredient', payload).then((r) => context.commit('ADD_INGREDIENT', r.data))
-        },
-        async updateIngredient(context, payload){
-            await axios.put('/api/ingredient/'+payload.id, payload).then((r) => context.commit('EDIT_INGREDIENT', r.data))
-        },
-        async deleteIngredient(context, payload){
-            await axios.post('/api/ingredient/'+payload.id, payload).then((r) => context.commit('EDIT_INGREDIENT', r.data))
-        },
-        async getCategories(context, payload){
-            await axios.get('/api/category', payload).then((r) => context.commit('GET_CATEGORIES', r.data))
-        },
-        async setCategory(context, payload){
-            await axios.post('/api/category', payload).then((r) => context.commit('ADD_CATEGORY', r.data))
-        },
-        async updateCategory(context, payload){
-            await axios.put('/api/category/'+payload.id, payload).then((r) => context.commit('EDIT_CATEGORY', r.data))
-        },
-        async deleteCategory(context, payload){
-            await axios.post('/api/category/'+payload.id, payload).then((r) => context.commit('EDIT_CATEGORY', r.data))
-        },
-        async getGroups(context, payload){
-            await axios.get('/api/group', payload).then((r) => context.commit('GET_GROUPS', r.data))
-        },
-        async setGroup(context, payload){
-            await axios.post('/api/group', payload).then((r) => context.commit('ADD_GROUP', r.data))
-        },
-        async updateGroup(context, payload){
-            await axios.put('/api/group/'+payload.id, payload).then((r) => context.commit('EDIT_GROUP', r.data))
-        },
-        async getFoods(context, payload = 0){
-            await axios.get('/api/food/' + payload.group_id).then((r) => context.commit('GET_FOODS', r.data))
-        },
-        async setFood(context, payload){
-            await axios.post('/api/food', payload).then((r) => context.commit('ADD_FOOD', r.data))
-        },
-        async updateFood(context, payload){
-            await axios.put('/api/food/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD', r.data))
-        },
-        async getFoodIngredients(context, payload = 0){
-            await axios.get('/api/food-ingredient/' + payload.food_id).then((r) => context.commit('GET_FOOD_INGREDIENTS', r.data))
-        },
-        async setFoodIngredient(context, payload){
-            await axios.post('/api/food-ingredient', payload).then((r) => context.commit('ADD_FOOD_INGREDIENT', r.data))
-        },
-        async updateFoodIngredient(context, payload){
-            await axios.put('/api/food-ingredient/'+payload.food_id, payload).then((r) => context.commit('EDIT_FOOD_INGREDIENT', r.data))
-        },
-        async deleteFoodIngredient(context, payload){
-            await axios.post('/api/food-ingredient/'+payload.food_id, payload).then((r) => context.commit('EDIT_FOOD_INGREDIENT', r.data))
-        },
         async getMenus(context, payload){
             await axios.get('/api/menu', payload).then((r) => context.commit('GET_MENUS', r.data))
         },

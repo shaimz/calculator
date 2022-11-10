@@ -17,6 +17,7 @@ class CreateFoodTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->integer('group_id');
+            $table->integer('price_portion')
             $table->integer('portions');
         });
     }

@@ -58,10 +58,16 @@
 
 <script>
     import {defineComponent, ref, computed, watch, onMounted} from 'vue';
-    import {useStore} from 'vuex';
+    import { useCalculationStore } from '../store/calculation'
+    import { useIngredientStore } from '../store/ingredients'
     import dataTable from '../components/dataTable.vue';
     import modal from '../components/modal.vue';
-    import ingredients from "./ingredients";
+
+    const modelGroups = {
+        name: '',
+        type: 'group',
+        edited: false
+    }
 
     export default defineComponent({
         components: {
@@ -69,53 +75,37 @@
             modal
         },
         setup() {
-            const store = useStore();
-            const modal = ref(false);
-            const loading = ref(false);
+            const store = useCalculationStore()
+            const iStore = useIngredientStore()
+            const modal = ref(false)
+            const loading = ref(false)
 
             //Groups
-            let modelGroups = ref({name: '', type: 'group', edited: false});
-            let groupRows = ref([{...modelGroups.value}]);
-            const groups = computed(() => store.state.groups);
-
-            const group = ref(null);
+            let groupRows = ref([{ ...modelGroups }]);
+            const groups = computed(() => store.groups);
+            const group = computed(() => store.activeGroup)
 
             const fetchGroups = async () => {
-                loading.value = true;
-                await store.dispatch('getGroups').then(() => {
-                    loading.value = false;
-                    if (groups.value.length) {
-                        groupRows.value = groups.value.map((item) => {
-                            return {
-                                id: typeof item.id !== 'undefined' ? item.id : null,
-                                name: typeof item.name !== 'undefined' ? item.name : '',
-                                type: 'group',
-                                created: true,
-                            }
-                        });
+                loading.value = true
+                let result = await store.fetchGroups()
+                loading.value = false
+                groupRows.value = result.map((item) => {
+                    return {
+                        ...item,
+                        type: 'group',
+                        created: true,
                     }
                 });
-            };
-
-            watch(() => groups.value.length,
-                (n, o) => {
-                    if (n !== o) {
-                        fetchGroups().then(() => {
-                            group.value = groups.value.length ? (groups.value[0].hasOwnProperty('id') ? groups.value[0].id : null) : null;
-                        });
-                    }
-                }, {immediate: true});
-
-            const setGroup = (val) => {
-                group.value = val;
-            };
+                if (result.length && !store.activeGroup) setActiveGroup(result[0].id)
+            }
+            fetchGroups()
 
             //Foods
-            const foods = computed(() => store.state.foods);
-            const categories = computed(() => store.state.categories);
-            const ingredients = computed(() => store.state.ingredients);
+            const foods = computed(() => store.foods);
+            const categories = computed(() => iStore.categories);
+            const ingredients = computed(() => iStore.ingredients);
 
-            store.dispatch('getCategories', {});
+            iStore.fetchCategories()
             store.dispatch('getIngredients', {category_id: 'all'});
 
             const modalFoods = computed(() => ingredients.value.map((item) => {
