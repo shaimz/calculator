@@ -5,13 +5,14 @@
             <dataTable @loading="setLoading"
                        @fetchItems="fetchGroups"
                        :loading="loading"
-                       :key="groupRows"
+                       :key="groupRows.length"
                        :get="'getGroups'"
-                       :add="'setGroup'"
+                       :add="'addGroup'"
                        :update="'updateGroup'"
-                       @category="setGroup"
+                       @category="store.setActiveGroup"
                        :item-id="group"
-                       :model="modelGroups" :rows="groupRows">
+                       :model="modelGroups"
+                       :rows="groupRows">
             </dataTable>
         </div>
     </div>
@@ -22,10 +23,10 @@
                        @loading="setLoading"
                        @fetchItems="fetchFoods()"
                        :loading="loading"
-                       :key="foodRows"
+                       :key="foodRows.length"
                        :get="'getFoods'"
-                       @category="setFood"
-                       :add="'setFood'"
+                       @category="store.setActiveFood"
+                       :add="'addFood'"
                        :update="'updateFood'"
                        :item-id="group"
                        :food="food"
@@ -37,21 +38,23 @@
                    :type="'group'" :data="modalFoods" :group="group"
                    :dialog="modal"></modal>
 
-            <dataTable id="food-ingredient-list"
-                       v-if="food_ingredientRows[0]"
-                       @loading="setLoading"
-                       @fetchItems="fetchFoodIngredients(food)"
-                       :loading="loading"
-                       :key="food_ingredientRows"
-                       :get="'getFoodIngredients'"
-                       :add="'setFoodIngredient'"
-                       :update="'updateFoodIngredient'"
-                       :delete="'deleteFoodIngredient'"
-                       :item-id="food"
-                       :model="modelFoodIngredients"
-                       :rows="food_ingredientRows"
-                       :no-row="false">
-            </dataTable>
+            <div id="food-ingredient-list">
+                <dataTable
+                        v-if="food_ingredientRows[0]"
+                        @loading="setLoading"
+                        @fetchItems="fetchFoodIngredients(food)"
+                        :loading="loading"
+                        :key="food_ingredientRows.length"
+                        :get="'getFoodIngredients'"
+                        :add="'setFoodIngredient'"
+                        :update="'updateFoodIngredient'"
+                        :delete="'deleteFoodIngredient'"
+                        :item-id="food"
+                        :model="modelFoodIngredients"
+                        :rows="food_ingredientRows"
+                        :no-row="false">
+                </dataTable>
+            </div>
         </div>
     </div>
 </template>
@@ -98,60 +101,63 @@
 
             //Groups
             let groupRows = ref([{ ...modelGroups }]);
-            const groups = computed(() => store.groups);
             const group = computed(() => store.activeGroup)
-
-            const fetchGroups = async () => {
-                loading.value = true
-                groupRows.value = await store.fetchGroups()
-                loading.value = false
-                if (result.length && !store.activeGroup) store.setActiveGroup(groupRows.value[0].id)
-            }
-            fetchGroups()
-
-            //Foods
-            const foods = computed(() => store.foods);
-            const categories = computed(() => iStore.categories);
-            const ingredients = computed(() => iStore.ingredients);
-
-            iStore.fetchCategories()
-            iStore.fetchIngredients()
-
-            const modalFoods = computed(() => ingredients.value.map((item) => {
-                return {
-                    children: item.ingredients.map((elem) => {
-                        return {
-                            key: elem.id,
-                            name: elem.name,
-                            category_id: elem.category_id
-                        }
-                    }),
-                    disabled: false,
-                    key: item.id,
-                    name: item.name
-                }
-            }));
 
             let foodRows = ref([{ ...modelFoods }]);
             const food = computed(() => store.activeFood);
             const foodName = ref(null);
 
+            //Foods
+            const categories = computed(() => iStore.categories);
+            const ingredients = computed(() => iStore.ingredients);
+
+            //Ingredients
+            let food_ingredientRows = ref([{ ...modelFoodIngredients }]);
+
+            const fetchGroups = async () => {
+                loading.value = true
+                groupRows.value = await store.fetchGroups()
+                loading.value = false
+            }
+
             const fetchFoods = async () => {
                 loading.value = true;
                 foodRows.value = await store.fetchFoods()
-                foodName.value = result[0]?.name
+                foodName.value = foodRows.value[0].name
                 loading.value = false;
             };
-
-            //Ingredients
-            const food_ingredients = computed(() => store.food_ingredients);
-            let food_ingredientRows = ref([{ ...modelFoodIngredients }]);
 
             const fetchFoodIngredients = async () => {
                 loading.value = true;
                 food_ingredientRows.value = await store.fetchFoodIngredients()
                 loading.value = false;
             };
+
+            (async () => {
+                await fetchGroups()
+                await iStore.fetchCategories()
+                await iStore.fetchIngredients()
+                await fetchFoods()
+                await fetchFoodIngredients()
+            })()
+
+            const modalFoods = computed(() => {
+                let result = foodRows.value || []
+                return result.map((item) => {
+                    return {
+                        children: ingredients.value.map((elem) => {
+                            return {
+                                key: elem.id,
+                                name: elem.name,
+                                category_id: elem.category_id
+                            }
+                        }),
+                        disabled: false,
+                        key: item.id,
+                        name: item.name
+                    }
+                })
+            });
 
             const setLoading = (v) => {
                 loading.value = v;
@@ -161,27 +167,23 @@
                 modal.value = v
             };
             return {
-                foods,
-                groups,
                 foodRows,
                 groupRows,
                 modelFoods,
                 modelGroups,
                 ingredients,
-                setGroup,
+                store,
                 group,
                 food,
                 foodName,
                 modelFoodIngredients,
                 food_ingredientRows,
-                food_ingredients,
                 categories,
                 loading,
                 setLoading,
                 modal,
                 modalFoods,
                 toggleModal,
-                setFood,
                 fetchFoodIngredients,
                 fetchFoods,
                 fetchGroups

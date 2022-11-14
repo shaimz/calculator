@@ -30,13 +30,15 @@
 <!--                &lt;!&ndash;<el-button class="transfer-footer" size="small">Operation</el-button>&ndash;&gt;-->
 <!--            &lt;!&ndash;</template>&ndash;&gt;-->
 <!--        </el-transfer>-->
-        <ElTransferGroup :key="ingredients" @fetchItems="emitFetch" :itemId="itemId" :name="name" :type="props.type" :price="price" :quantity="quantity" :left-list="left" :right-list="right" />
+        <ElTransferGroup :key="foodIngredients" @fetchItems="emitFetch" :itemId="itemId" :name="name" :type="props.type" :price="price" :quantity="quantity" :left-list="left" :right-list="right" />
     </el-dialog>
 </template>
 
 <script>
     import {defineComponent, ref, computed, watch, toRefs, onMounted} from 'vue';
     import {useStore} from 'vuex';
+    import { useCalculationStore } from '../store/calculation'
+    import { useIngredientStore } from '../store/ingredients'
     import ElTransferGroup from "./transfer/el-transfer-group";
 
     export default defineComponent({
@@ -45,6 +47,8 @@
         emits:['modal','fetchItems'],
         setup(props, context){
             const store = useStore();
+            const ingredientStore = useIngredientStore()
+            const calculationStore = useCalculationStore()
             const dialog = computed(() => props.dialog);
             const modal = ref(dialog.value);
             const data = computed(() => props.data);
@@ -55,14 +59,21 @@
             const price = ref({});
 
             const checked = ref([]);
-            const ingredients = computed(() => store.state.food_ingredients);
+            const foodIngredients = computed(() => calculationStore.food_ingredients);
             const items = computed(() => store.state.menu_items);
 
             const right = computed(() => {
                 if(props.type === 'group'){
-                    return ingredients.value.map((item,index) => {
+                    return foodIngredients.value.map((item,index) => {
                         if(!item.ingredient.hasOwnProperty('name')) return false;
-                        else return {key:item.ingredient_id,name:item.ingredient.name !== 'undefined' ? item.ingredient.name : '',category_id:item.category_id, price_portion:item.food.price_portion,portions:item.food.portions, fixed:true}
+                        return {
+                            key:item.ingredient_id,
+                            name:item.ingredient.name !== 'undefined' ? item.ingredient.name : '',
+                            category_id:item.category_id,
+                            price_portion:item.food.price_portion,
+                            portions:item.food.portions,
+                            fixed:true
+                        }
                     }).filter(it => it);
                 }else{
                     return items.value.map((item,index) => {return {key:item.food_id,name:item.food.name,price_portion:item.food.price_portion,portions:item.food.portions,menu_id:item.menu_id,group_id:item.food.group_id, fixed:true}})
@@ -113,22 +124,21 @@
                 }
             });
 
-            watch(() => itemId.value, (n,o) => {
+            watch(() => itemId.value, async (n, o) => {
                 if(n !== o){
                     if(itemId.value){
                         quantity.value = {};
                         price.value = {};
                         if(props.type === 'group'){
-                            store.dispatch('getFoodIngredients',{food_id:itemId.value}).then(() => {
-                                console.log(ingredients.value);
-                                ingredients.value.map((item) => quantity.value[item.ingredient_id] = item.quantity)
-                            });
-                        }else{
-                            store.dispatch('getMenuItems',{menu_id:itemId.value}).then(() => {
-                            console.log(items.value);
-                                items.value.map((item) => price.value[item.food_id] = item.portions)
-                            });
+                            let result = await calculationStore.fetchFoodIngredients()
+                            result.map((item) => quantity.value[item.ingredient_id] = item.quantity)
+                            return
                         }
+                        store.dispatch('getMenuItems',{menu_id:itemId.value}).then(() => {
+                        console.log(items.value);
+                            items.value.map((item) => price.value[item.food_id] = item.portions)
+                        });
+
                     }
                 }
             },{immediate:true})
@@ -164,7 +174,7 @@
                 quantity,
                 price,
                 checked,
-                ingredients,
+                foodIngredients,
                 items,
                 openDialog,
                 props,

@@ -12,6 +12,8 @@ export const useCalculationStore = defineStore("calculation", {
   actions: {
     async fetchGroups(){
       let result = await axios.get('/api/group').then((r) => r.data)
+      console.log(result)
+      if (result.length && !this.activeGroup) this.setActiveGroup(result[0].id)
       return result.map((item) => {
         return {
             ...item,
@@ -40,6 +42,7 @@ export const useCalculationStore = defineStore("calculation", {
     },
     async fetchFoods(){
       let result = await axios.get(`/api/food/${this.activeGroup}`).then((r) => r.data)
+      if (result.length && !this.activeFood) this.setActiveFood(result[0].id)
       await this.fetchFoodIngredients()
       return result.map((item) => {
         return {
@@ -52,6 +55,7 @@ export const useCalculationStore = defineStore("calculation", {
     async setActiveFood(id){
       if (this.activeFood == id) return
       this.activeFood = id
+      await this.fetchFoodIngredients()
       return
       await axios.post('/api/food', payload).then((r) => context.commit('ADD_FOOD', r.data))
     },

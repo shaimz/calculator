@@ -1,10 +1,10 @@
 <template>
     <el-button type="success" v-if="noButton" @click="addRow()" round>Adding row</el-button>
     <el-button @click="select">{{selecting ? 'Cancel' : 'Select'}}</el-button>
-    <el-table :id="props.add + '-table'" :class="[noButton ? 'mt-4' : '']" :key="datas" :data="datas" :row-class-name="checkActive" :lazy="true" v-loading="load" border height="350"
+    <el-table :id="props.add + '-table'" :class="[noButton ? 'mt-4' : '']" :key="rows" :data="rows" :row-class-name="checkActive" :lazy="true" v-loading="load" border height="350"
               style="width:100%;margin-top: 15px;" current-row-key="40" @row-click="handleChange">
         <el-table-column labell="" width="50px" v-if="checkProperty('type')">
-            <template #default="scope" v-if="['category','group','food','menu'].includes(datas[0].type)">
+            <template #default="scope" v-if="['category','group','food','menu'].includes(rows[0].type)">
                 <span
                     v-if="scope.row.hasOwnProperty('id') && checkActive(scope)"
                     class="rounded-circle bg-success active m-auto"></span>
@@ -118,6 +118,35 @@
 <script>
     import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
     import {useStore} from 'vuex';
+    import { useCalculationStore } from '../store/calculation'
+    import { useIngredientStore } from '../store/ingredients'
+
+    const options = [
+        {
+            value: 'kg',
+            label: 'Kg'
+        },
+        {
+            value: 'buc',
+            label: 'buc.'
+        },
+        {
+            value: 'g',
+            label: 'g'
+        },
+        {
+            value: 'l',
+            label: 'L'
+        },
+        {
+            value: 'mg',
+            label: 'Mg'
+        },
+        {
+            value: 'ml',
+            label: 'Ml'
+        }
+    ];
 
     export default defineComponent({
         props: ['rows', 'model', 'itemId', 'add', 'get', 'update', 'loading', 'food', 'delete','noRow'],
@@ -126,32 +155,6 @@
             const store = useStore();
             const prop = toRefs(props);
             const load = prop.loading;
-            const options = [
-                {
-                    value: 'kg',
-                    label: 'Kg'
-                },
-                {
-                    value: 'buc',
-                    label: 'buc.'
-                },
-                {
-                    value: 'g',
-                    label: 'g'
-                },
-                {
-                    value: 'l',
-                    label: 'L'
-                },
-                {
-                    value: 'mg',
-                    label: 'Mg'
-                },
-                {
-                    value: 'ml',
-                    label: 'Ml'
-                }
-            ];
             const loading = computed({
                 get: () => load.value,
                 set: (v) => {
@@ -162,18 +165,20 @@
             const selecting = ref(false);
             const itemId = computed(() => props.itemId);
             const food = computed(() => props.food);
-            const datas = ref([...props.rows]);
+            const rows = ref([...props.rows]);
             const error = ref([]);
             const model = reactive({...props.model});
+
             const addRow = () => {
-                datas.value.push({...model})
+                rows.value.push({ ...model })
                 nextTick(() => {
                     console.log(focus);
                     focus.value.focus();
                 });
-            };
+            }
+
             const add = (index) => {
-                let data = {...datas.value[index]};
+                let data = { ...rows.value[index] };
                 let type = '';
 
                 switch (props.add) {
@@ -188,25 +193,26 @@
                         break;
                 }
 
-                if (data.name) {
-                    store.dispatch(props.add, data).then((r) => {
-                        loading.value = true;
-                        let params = {};
-                        let item = datas.value[index];
-                        params[type] = itemId.value;
-                        if (!item.hasOwnProperty('created') && item.name) {
-                            item.created = true;
-                            delete item.edited;
-                        }
-                        context.emit('fetchItems');
-                        store.dispatch(props.get, params).then(() => loading.value = false);
-                    });
-                } else {
+                if (!data.name) {
                     error.value[index] = 'Name is empty'
+                    return
                 }
+
+                store.dispatch(props.add, data).then((r) => {
+                    loading.value = true;
+                    let params = {};
+                    let item = rows.value[index];
+                    params[type] = itemId.value;
+                    if (!item.hasOwnProperty('created') && item.name) {
+                        item.created = true;
+                        delete item.edited;
+                    }
+                    context.emit('fetchItems');
+                    store.dispatch(props.get, params).then(() => loading.value = false);
+                });
             };
             const update = (index) => {
-                let data = {...datas.value[index]};
+                let data = {...rows.value[index]};
                 let type = '';
 
                 switch (props.add) {
@@ -225,23 +231,22 @@
                         break;
                 }
 
-                if (data.name) {
-                    store.dispatch(props.update, data).then(() => {
-                        loading.value = true;
-                        let params = {};
-                        params[type] = itemId.value;
+                if (!data.name) return
+                store.dispatch(props.update, data).then(() => {
+                    loading.value = true;
+                    let params = {};
+                    params[type] = itemId.value;
 
-                        context.emit('fetchItems');
-                        store.dispatch(props.get, params).then(() => {
-                            loading.value = false;
-                            delete datas.value[index].edited;
-                        });
+                    context.emit('fetchItems');
+                    store.dispatch(props.get, params).then(() => {
+                        loading.value = false;
+                        delete rows.value[index].edited;
                     });
-                }
+                });
             };
             const setEdit = (e, index) => {
                 setTimeout(() => {
-                    datas.value[index].edited = false;
+                    rows.value[index].edited = false;
                 }, 200)
 
             };
@@ -249,13 +254,12 @@
                 e.stopImmediatePropagation();
             };
             const handleDelete = (index) => {
-                let data = datas.value[index];
-                if (data.id) {
-                    store.dispatch(props.delete, data).then(() => {
-                        datas.value.splice(index, 1);
-                        context.emit('fetchItems');
-                    })
-                }
+                let data = rows.value[index];
+                if (!data.id) return
+                store.dispatch(props.delete, data).then(() => {
+                    rows.value.splice(index, 1);
+                    context.emit('fetchItems');
+                })
             };
             const select = () => {
                 selecting.value = !selecting.value;
@@ -268,10 +272,10 @@
                     }else{
                         loading.value = true;
                         context.emit('category', row.id);
-                        datas.value.map((item, i) => {
-                            delete datas.value[i].edited
+                        rows.value.map((item, i) => {
+                            delete rows.value[i].edited
                         });
-                        datas.value = datas.value.filter((item) => item.name)
+                        rows.value = rows.value.filter((item) => item.name)
                         loading.value = false;
                     }
 
@@ -281,7 +285,7 @@
 
             const foodId = computed(() => props.food);
             const cellClass = (row) => {
-                if (row.row.id === datas.value[0].id && ['group', 'category', 'food', 'menu'].includes(row.row.type) || (row.row.id === itemId.value || row.row.id === foodId.value)) {
+                if (row.row.id === rows.value[0].id && ['group', 'category', 'food', 'menu'].includes(row.row.type) || (row.row.id === itemId.value || row.row.id === foodId.value)) {
                     return 'active-row-first';
                 }
 
@@ -291,7 +295,7 @@
             }
 
             const checkProperty = (property, index = 0) => {
-                if (typeof datas.value[index] !== "undefined") return datas.value[index].hasOwnProperty(property);
+                if (typeof rows.value[index] !== "undefined") return rows.value[index].hasOwnProperty(property);
                 return false;
             };
 
@@ -302,7 +306,7 @@
             const checkActive = (scope) => {
                 switch (scope.row.type) {
                     case 'food':
-                        if (scope.row.id === food.value && food.value !== 'undefined') {
+                        if (scope.row.id === food.value && food.value !== undefined) {
                             nextTick(() => {
                                 let $container = $('#' + props.add + '-table .el-table__body-wrapper'),
                                     $scrollTo = $('#' + props.add + '-table .el-table__body-wrapper .active-first-row');
@@ -313,7 +317,7 @@
                         }
                         break;
                     default:
-                        if (scope.row.id === itemId.value && itemId.value !== 'undefined'){
+                        if (scope.row.id === itemId.value && itemId.value !== undefined){
                             nextTick(() => {
                                 let $container = $('#' + props.add + '-table .el-table__body-wrapper'),
                                     $scrollTo = $('#' + props.add + '-table .el-table__body-wrapper .active-first-row');
@@ -329,11 +333,11 @@
             }
 
             const noButton = () => {
-                return (props.get !== 'getFoodIngredients' && props.get !== 'getMenuItems') && props.noRow === 'undefined'
+                return (props.get !== 'getFoodIngredients' && props.get !== 'getMenuItems') && props.noRow === undefined
             }
 
             return {
-                datas,
+                rows,
                 options,
                 itemId,
                 loading,
