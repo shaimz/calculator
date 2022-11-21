@@ -1,37 +1,49 @@
 <template>
     <el-button type="success" v-if="noButton" @click="addRow()" round>Adding row</el-button>
     <el-button @click="select">{{selecting ? 'Cancel' : 'Select'}}</el-button>
-    <el-table :id="props.add + '-table'" :class="[noButton ? 'mt-4' : '']" :key="rows" :data="rows" :row-class-name="checkActive" :lazy="true" v-loading="load" border height="350"
-              style="width:100%;margin-top: 15px;" current-row-key="40" @row-click="handleChange">
-        <el-table-column labell="" width="50px" v-if="checkProperty('type')">
+    <el-table 
+        :id="props.add + '-table'" 
+        :class="[noButton ? 'mt-4' : '']" 
+        :key="rows" 
+        :data="rows" 
+        :row-class-name="checkActive" 
+        :lazy="true" 
+        v-loading="loading" 
+        border 
+        height="350"
+        style="width:100%;margin-top: 15px;" 
+        current-row-key="40" 
+        @row-click="handleChange
+    ">
+        <el-table-column label="" width="50" v-if="checkProperty('type')">
             <template #default="scope" v-if="['category','group','food','menu'].includes(rows[0].type)">
                 <span
                     v-if="scope.row.hasOwnProperty('id') && checkActive(scope)"
                     class="rounded-circle bg-success active m-auto"></span>
             </template>
         </el-table-column>
-        <el-table-column label="Name" width="250" v-if="checkProperty('name')">
+        <el-table-column 
+            v-for="column in filterColumns" 
+            :key="column.id"
+            :label="column.label"
+            :width="column.width"
+        >
             <template #default="scope">
-                <span class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
-                <el-input v-model="scope.row.name" ref="focus" type="text" @click="stopPropagation($event)"
-                          v-if="checkProperty('edited',scope.$index)"></el-input>
-                <span v-else>{{scope.row.name}}</span>
-            </template>
-        </el-table-column>
-
-        <el-table-column label="Quantity" width="100" v-if="checkProperty('quantity')">
-            <template #default="scope">
-                <span class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
-                <el-input v-model="scope.row.quantity" type="number" @click="stopPropagation($event)"
-                          v-if="checkProperty('edited',scope.$index)"></el-input>
-                <span v-else>{{scope.row.quantity}}</span>
-            </template>
-        </el-table-column>
-
-        <el-table-column label="Measure" width="100" v-if="checkProperty('measure')">
-            <template #default="scope">
-                <el-select v-model="scope.row.measure" @click="stopPropagation($event)" placeholder="Select"
-                           v-if="checkProperty('edited',scope.$index)">
+                <span :key="column.id" class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
+                <el-input
+                    :key="column.id" 
+                    v-if="checkTypeAndVisibility(column.type, ['text', 'number'])" 
+                    v-model="scope.row[column.id]" 
+                    ref="focus" 
+                    :type="column.type" 
+                    @click="stopPropagation($event)"
+                ></el-input>
+                <el-select 
+                    v-else-if="checkTypeAndVisibility(column.type, ['select'])" 
+                    v-model="scope.row[column.od]" 
+                    @click="stopPropagation($event)" 
+                    placeholder="Select"
+                >
                     <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -39,55 +51,16 @@
                         :value="item.value">
                     </el-option>
                 </el-select>
-                <span v-else>{{scope.row.measure}}</span>
-            </template>
-        </el-table-column>
-
-        <el-table-column label="Portions" width="100" v-if="checkProperty('portions')">
-            <template #default="scope">
-                <el-input v-model="scope.row.portions" @click="stopPropagation($event)"
-                          v-if="checkProperty('edited',scope.$index)" type="number"></el-input>
-                <span v-else>{{scope.row.portions}}</span>
-            </template>
-        </el-table-column>
-
-        <el-table-column label="Price" width="100" v-if="checkProperty('price')">
-            <template #default="scope">
-                <el-input v-model="scope.row.price" @click="stopPropagation($event)"
-                          v-if="checkProperty('edited',scope.$index)" type="number"></el-input>
-                <span v-else>{{scope.row.price}}</span>
-            </template>
-        </el-table-column>
-
-        <el-table-column label="Price actual" width="100" v-if="checkProperty('purchase_price')">
-            <template #default="scope">
-                <el-input v-model="scope.row.purchase_price" @click="stopPropagation($event)"
-                          v-if="checkProperty('edited',scope.$index)" type="number"></el-input>
-                <span v-else>{{scope.row.purchase_price}}</span>
-            </template>
-        </el-table-column>
-
-        <el-table-column label="Price p/portion" width="150" v-if="checkProperty('price_portion')">
-            <template #default="scope">
-                <el-input v-model="scope.row.price_portion" @click="stopPropagation($event)" type="number"
-                          v-if="checkProperty('edited',scope.$index)"></el-input>
-                <span v-else>{{scope.row.price_portion}}</span>
-            </template>
-        </el-table-column>
-
-        <el-table-column label="Date" width="150" v-if="checkProperty('date')">
-            <template #default="scope">
                 <el-date-picker
+                    v-else-if="checkTypeAndVisibility(column.type, ['date'])" 
                     @click="stopPropagation($event)"
-                    v-model="scope.row.date"
-                    v-if="checkProperty('edited',scope.$index)"
+                    v-model="scope.row[column.id]"
                     type="date"
                     format="DD/MM/YYYY"
                     value-format="DD/MM/YYYY"
                     placeholder="Pick a day">
                 </el-date-picker>
-                <!--<el-input v-model="scope.row.date" @click="stopPropagation($event)" type="number" v-if="checkProperty('edited',scope.$index)"></el-input>-->
-                <span v-else>{{scope.row.date}}</span>
+                <span v-else>{{scope.row[column.id]}}</span>
             </template>
         </el-table-column>
 
@@ -95,19 +68,19 @@
             <template #default="scope">
                 <el-button data-id="add_i"
                            v-if="(checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index) && props.get === 'getFoods') || props.get === 'getMenus'"
-                           size="mini" type="success" icon="el-icon-plus" circle @click="addItems()"></el-button>
+                           size="small" type="success" icon="el-icon-plus" circle @click="addItems()"></el-button>
                 <el-button data-id="add" v-if="!checkProperty('created',scope.$index) && props.get !== 'getMenuItems'"
-                           size="mini" type="success" @click="add(scope.$index)">Add
+                           size="small" type="success" @click="add(scope.$index)">Add
                 </el-button>
                 <el-button data-id="edit"
                            v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index)"
-                           size="mini" type="primary" @click="setEdit($event,scope.$index)">Edit
+                           size="small" type="primary" @click="setEdit($event,scope.$index)">Edit
                 </el-button>
                 <el-button data-id="update"
                            v-if="checkProperty('edited',scope.$index) && checkProperty('created',scope.$index)"
-                           size="mini" type="success" @click="update(scope.$index)">Save
+                           size="small" type="success" @click="update(scope.$index)">Save
                 </el-button>
-                <el-button data-id="delete" v-if="checkProperty('created',scope.$index)" size="mini" type="danger"
+                <el-button data-id="delete" v-if="checkProperty('created',scope.$index)" size="small" type="danger"
                            @click="handleDelete(scope.$index)">Delete
                 </el-button>
             </template>
@@ -116,10 +89,13 @@
 </template>
 
 <script>
-    import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
+    import { storeToRefs } from 'pinia';
+import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
     import {useStore} from 'vuex';
     import { useCalculationStore } from '../store/calculation'
     import { useIngredientStore } from '../store/ingredients'
+    import { useSharedStore } from '../store/shared'
+    import { columns } from './dataTableColumns'
 
     const options = [
         {
@@ -149,45 +125,51 @@
     ];
 
     export default defineComponent({
-        props: ['rows', 'model', 'itemId', 'add', 'get', 'update', 'loading', 'food', 'delete','noRow'],
+        props: ['data', 'model', 'itemId', 'addAction', 'itemType', 'getAction', 'updateAction', 'loading', 'food', 'deleteAction', 'noRow' ],
         emits: ['category', 'modal', 'loading', 'fetchItems','categories'],
         setup(props, context) {
             const store = useStore();
-            const prop = toRefs(props);
-            const load = prop.loading;
-            const loading = computed({
-                get: () => load.value,
+            const shared = useSharedStore()
+            const { mode } = storeToRefs(shared)
+            const { data, model, itemId, addAction, itemType, getAction, updateAction, loading, food, deleteAction, noRow } = toRefs(props);
+            const setLoading = computed({
+                get: () => loading,
                 set: (v) => {
                     context.emit('loading', v)
                 }
             });
+            const filterColumns = computed(() => {
+                let row = rows.value[0]
+                return columns.filter(column => {
+                    if (row[column.id]) return true
+                })
+            })
             const focus = ref(null);
             const selecting = ref(false);
-            const itemId = computed(() => props.itemId);
-            const food = computed(() => props.food);
-            const rows = ref([...props.rows]);
+            const rows = ref([...data.value]);
             const error = ref([]);
-            const model = reactive({...props.model});
 
             const addRow = () => {
-                rows.value.push({ ...model })
+                shared.setMode('edit')
+                rows.value.push({ ...model.value })
                 nextTick(() => {
-                    console.log(focus);
+                    console.log(focus.value);
                     focus.value.focus();
                 });
             }
 
             const add = (index) => {
+                shared.setMode("edit")
                 let data = { ...rows.value[index] };
                 let type = '';
 
-                switch (props.add) {
+                switch (props.itemType) {
                     case 'setIngredient':
                         data.category_id = itemId.value;
                         type = 'category_id';
                         break;
 
-                    case 'setFood':
+                    case 'addFood':
                         data.group_id = itemId.value;
                         type = 'group_id';
                         break;
@@ -198,7 +180,7 @@
                     return
                 }
 
-                store.dispatch(props.add, data).then((r) => {
+                addAction(data).then((r) => {
                     loading.value = true;
                     let params = {};
                     let item = rows.value[index];
@@ -209,13 +191,14 @@
                     }
                     context.emit('fetchItems');
                     store.dispatch(props.get, params).then(() => loading.value = false);
+                    shared.setMode("view")
                 });
             };
             const update = (index) => {
                 let data = {...rows.value[index]};
                 let type = '';
 
-                switch (props.add) {
+                switch (itemType) {
                     case 'setIngredient':
                         data.category_id = itemId.value;
                         type = 'category_id';
@@ -242,9 +225,11 @@
                         loading.value = false;
                         delete rows.value[index].edited;
                     });
+                    shared.setMode("view")
                 });
             };
             const setEdit = (e, index) => {
+                shared.setMode("edit")
                 setTimeout(() => {
                     rows.value[index].edited = false;
                 }, 200)
@@ -308,8 +293,8 @@
                     case 'food':
                         if (scope.row.id === food.value && food.value !== undefined) {
                             nextTick(() => {
-                                let $container = $('#' + props.add + '-table .el-table__body-wrapper'),
-                                    $scrollTo = $('#' + props.add + '-table .el-table__body-wrapper .active-first-row');
+                                let $container = $('#' + addAction + '-table .el-table__body-wrapper'),
+                                    $scrollTo = $('#' + addAction + '-table .el-table__body-wrapper .active-first-row');
 
                                 $container.scrollTop($scrollTo.offset().top);
                             });
@@ -332,6 +317,13 @@
                 return ''
             }
 
+            const checkTypeAndVisibility = (columnType, type) => {
+                if (mode.value == 'edit') return true
+                if (type && !type.includes(columnType)) return false
+                if (rows.value.length) return rows.value[0].hasOwnProperty(columnType);
+                return false
+            }
+
             const noButton = () => {
                 return (props.get !== 'getFoodIngredients' && props.get !== 'getMenuItems') && props.noRow === undefined
             }
@@ -339,14 +331,15 @@
             return {
                 rows,
                 options,
+                filterColumns,
                 itemId,
                 loading,
-                load,
                 props,
                 food,
                 error,
                 focus,
                 selecting,
+                mode,
                 addRow,
                 handleDelete,
                 checkProperty,
@@ -359,7 +352,8 @@
                 stopPropagation,
                 addItems,
                 checkActive,
-                noButton
+                noButton,
+                checkTypeAndVisibility
             }
         }
     })

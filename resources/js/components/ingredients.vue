@@ -2,19 +2,50 @@
     <div id="categories">
         <h2>Categories</h2>
         <div id="categories-list">
-            <dataTable
-                :loading="loading"
-                :key="categoryRows"
-                :get="'fetchCategories'"
-                :add="'addCategory'"
-                :update="'updateCategory'"
-                :delete="'deleteCategory'"
-                :item-id="category"
-                :model="modelCategory"
-                :rows="categoryRows"
-                @category="setActiveCategory"
-                @loading="setLoading"
-            ></dataTable>
+            <Suspense>
+                <Grid  
+                    ref="grid"
+                    v-bind="$attrs"
+                    :columns="columns"
+                    :rows="rows"
+                    :actions="actions"
+                    :rowsBackup="rowsBackup"
+                    :rowsDelete="rowsDelete"
+                    :rowActions="rowActions"
+                    :mode="mode"
+                    :useDrag="useDrag"
+                    :locked="locked"
+                    :searchFilter="searchFilter"
+                    :customDecorateRows="customDecorateRows"
+                    :deleteConfirmation="deleteConfirmation"
+                    @set-mode="setMode($event)"
+                    @sort-grid-by="onSortBy"
+                    @save-grid="onCommandSave"
+                    @row-delete="onRowDelete"
+                    @row-send="onRowSend"
+                    @row-history="onRowHistory"
+                    @row-show="onRowShow"
+                    @row-swap="onRowSwap"
+                    @row-edit="onRowEdit"
+                    @row-back="onRowBack"
+                    @rows-order="onRowsOrder"
+                >
+
+                </Grid>
+                <dataTable
+                    :loading="loading"
+                    :key="categoryRows"
+                    :getAction="'fetchCategories'"
+                    :addAction="'addCategory'"
+                    :updateAction="'updateCategory'"
+                    :deleteAction="'deleteCategory'"
+                    :item-id="category"
+                    :model="modelCategory"
+                    :data="categoryRows"
+                    @category="setActiveCategory"
+                    @loading="setLoading"
+                ></dataTable>
+            </Suspense>
         </div>
     </div>
     <div id="ingredients">
@@ -23,13 +54,13 @@
             <dataTable
                 :loading="loading"
                 :key="ingredients"
-                :get="'fetchIngredients'"
-                :add="'addIngredient'"
-                :update="'updateIngredient'"
-                :delete="'deleteIngredient'"
+                :getAction="'fetchIngredients'"
+                :addAction="'addIngredient'"
+                :updateAction="'updateIngredient'"
+                :deleteAction="'deleteIngredient'"
                 :item-id="category"
                 :model="modelIngredient"
-                :rows="ingredients"
+                :data="ingredients"
                 @loading="setLoading"
                 @fetchItems="store.fetchIngredients()"
             ></dataTable>

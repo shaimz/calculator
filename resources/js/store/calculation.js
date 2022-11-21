@@ -12,7 +12,6 @@ export const useCalculationStore = defineStore("calculation", {
   actions: {
     async fetchGroups(){
       let result = await axios.get('/api/group').then((r) => r.data)
-      console.log(result)
       if (result.length && !this.activeGroup) this.setActiveGroup(result[0].id)
       return result.map((item) => {
         return {
@@ -41,6 +40,7 @@ export const useCalculationStore = defineStore("calculation", {
       await this.fetchFoods()
     },
     async fetchFoods(){
+      if(!this.activeGroup) return []
       let result = await axios.get(`/api/food/${this.activeGroup}`).then((r) => r.data)
       if (result.length && !this.activeFood) this.setActiveFood(result[0].id)
       await this.fetchFoodIngredients()
@@ -52,6 +52,16 @@ export const useCalculationStore = defineStore("calculation", {
         }
       })
     },
+    async addFood(data){
+      await axios.post('/api/food', data).then((r) => {
+        let food = r.data
+        let exists = this.foods.find((item) => item.name === food.name);
+
+        if (!exists) {
+            this.foods.push({...food});
+        }
+      })
+  },
     async setActiveFood(id){
       if (this.activeFood == id) return
       this.activeFood = id
@@ -63,6 +73,7 @@ export const useCalculationStore = defineStore("calculation", {
         await axios.put('/api/food/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD', r.data))
     },
     async fetchFoodIngredients(){
+        if(!this.activeFood) return []
         let result = await axios.get(`/api/food-ingredient/${this.activeFood}`).then((r) => r.data)
         return result.map((item) => {
           if(!item.ingredient.name) return {}

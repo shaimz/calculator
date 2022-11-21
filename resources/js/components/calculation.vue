@@ -5,6 +5,7 @@
             <dataTable @loading="setLoading"
                        @fetchItems="fetchGroups"
                        :loading="loading"
+                       itemType="group"
                        :key="groupRows.length"
                        :get="'getGroups'"
                        :add="'addGroup'"
@@ -12,26 +13,27 @@
                        @category="store.setActiveGroup"
                        :item-id="group"
                        :model="modelGroups"
-                       :rows="groupRows">
+                       :data="groupRows">
             </dataTable>
         </div>
     </div>
     <div id="ingredients">
         <h2>Food and Ingredients</h2>
         <div id="food-list" v-if="groupRows[0].created">
-            <dataTable @modal="toggleModal"
+            <dataTable itemType="food"
+                       @modal="toggleModal"
                        @loading="setLoading"
-                       @fetchItems="fetchFoods()"
+                       @fetchItems="fetchFoods"
                        :loading="loading"
                        :key="foodRows.length"
-                       :get="'getFoods'"
+                       :get="fetchFoods"
                        @category="store.setActiveFood"
-                       :add="'addFood'"
-                       :update="'updateFood'"
+                       :add="store.addFood"
+                       :update="store.updateFood"
                        :item-id="group"
                        :food="food"
                        :model="modelFoods"
-                       :rows="foodRows">
+                       :data="foodRows">
             </dataTable>
 
             <modal @fetchItems="fetchFoodIngredients(food)" :key="food" @modal="toggleModal" :itemId="food"
@@ -41,6 +43,7 @@
             <div id="food-ingredient-list">
                 <dataTable
                         v-if="food_ingredientRows[0]"
+                        itemType="food_ingredient"
                         @loading="setLoading"
                         @fetchItems="fetchFoodIngredients(food)"
                         :loading="loading"
@@ -51,7 +54,7 @@
                         :delete="'deleteFoodIngredient'"
                         :item-id="food"
                         :model="modelFoodIngredients"
-                        :rows="food_ingredientRows"
+                        :data="food_ingredientRows"
                         :no-row="false">
                 </dataTable>
             </div>
@@ -116,20 +119,23 @@
 
             const fetchGroups = async () => {
                 loading.value = true
-                groupRows.value = await store.fetchGroups()
+                let result = await store.fetchGroups()
+                if (result.length) groupRows.value = result
                 loading.value = false
             }
 
             const fetchFoods = async () => {
                 loading.value = true;
-                foodRows.value = await store.fetchFoods()
-                foodName.value = foodRows.value[0].name
+                let result = await store.fetchFoods()
+                if(result.length) foodRows.value = result
+                if (foodRows.value.length) foodName.value = foodRows.value[0].name
                 loading.value = false;
             };
 
             const fetchFoodIngredients = async () => {
                 loading.value = true;
-                food_ingredientRows.value = await store.fetchFoodIngredients()
+                let result = await store.fetchFoodIngredients()
+                if (result.length) food_ingredientRows.value = result
                 loading.value = false;
             };
 

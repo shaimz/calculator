@@ -3,7 +3,7 @@ import {createApp} from 'vue';
 import router from './router/router'
 import { store } from './store/store';
 import { createPinia } from 'pinia'
-import 'element-plus/lib/theme-chalk/index.css';
+import 'element-plus/theme-chalk/index.css';
 
 const app = createApp({});
 
@@ -36,7 +36,7 @@ import {
     ElCollapse,
     ElCollapseItem,
     ElDatePicker
-} from 'element-plus';
+} from 'element-plus/lib';
 
 import ElTransferGroup from '../js/components/transfer/el-transfer-group';
 const components = [
@@ -67,7 +67,7 @@ components.forEach(component => {
 });
 
 
-import {ElLoading} from 'element-plus';
+import {ElLoading} from 'element-plus/lib';
 app.use(ElLoading);
 
 import vClickOutside from "click-outside-vue3"

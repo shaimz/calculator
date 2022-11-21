@@ -1,5 +1,5 @@
 const {VueLoaderPlugin} = require("vue-loader");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 const WebpackBundleAnalyzer = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require("path");
@@ -14,7 +14,6 @@ module.exports = {
         path: path.resolve(__dirname, "public/js"),
     },
     plugins: [
-        new UglifyJsPlugin(),
         new WebpackBundleAnalyzer(),
         new VueLoaderPlugin(),
         new MiniCssExtractPlugin({
@@ -89,6 +88,8 @@ module.exports = {
     },
     optimization: {
         concatenateModules: true,
+        minimize: true,
+        minimizer: [new TerserPlugin()],
         splitChunks: {
             cacheGroups: {
                 vendor: {
