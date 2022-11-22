@@ -47,9 +47,9 @@ class FoodController extends Controller
         if(!$db_data) {
             $food = new Food();
             $food->name = $request->name;
-            $food->group_id = $request->group_id;
-            $food->portions = $request->portions;
-            $food->price_portion = $request->price_portion;
+            $food->group_id = $request->parent_id;
+            $food->portions = $request->portions ?? 1;
+            $food->price_portion = $request->price_portion ?? 0;
             $food->save();
         }
 
@@ -89,7 +89,7 @@ class FoodController extends Controller
     {
         $food = Food::find($id);
         $food->name = $request->name ?? '';
-        $food->portions = $request->portions ?? 0;
+        $food->portions = $request->portions ?? 1;
         $food->price_portion = $request->price_portion ?? 0;
         $food->save();
 

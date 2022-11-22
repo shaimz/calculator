@@ -18,7 +18,7 @@ class FoodIngredientController extends Controller
      */
     public function index(Request $request)
     {
-        $food_id = $request->food_id;
+        $food_id = $request->parent_id;
         return response()->json(FoodIngredient::where('food_id', $food_id)->with('food')->with('ingredient')->get());
     }
 

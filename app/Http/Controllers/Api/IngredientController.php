@@ -47,7 +47,7 @@ class IngredientController extends Controller
         if(!$db_data){
             $ingredient = new Ingredient();
             $ingredient->name = $request->name;
-            $ingredient->category_id = $request->category_id;
+            $ingredient->category_id = $request->parent_id;
             $ingredient->price = $request->price;
             $ingredient->purchase_price = $request->purchase_price;
             $ingredient->measure = $request->measure;

@@ -17,7 +17,7 @@ class MenuItemController extends Controller
      */
     public function index(Request $request)
     {
-        $menu_id = $request->menu_id;
+        $menu_id = $request->parent_id;
         return response()->json(MenuItem::where('menu_id',$menu_id)->with('food')->get());
     }
 
@@ -47,8 +47,8 @@ class MenuItemController extends Controller
 
         if(!$db_data) {
             $item = new MenuItem();
-            $item->food_id = $request->food_id;
-            $item->menu_id = $request->menu_id;
+            $item->food_id = $request->item_id;
+            $item->menu_id = $request->parent_id;
             $item->portions = 1;
             $item->save();
         }
@@ -101,8 +101,8 @@ class MenuItemController extends Controller
         }else{
             $items = MenuItem::where(['menu_id' => $id,'food_id' => $request->food_id])->get();
             foreach($items as $item){
-                $item->food_id = $request->food_id ?? 0;
-                $item->menu_id = $request->menu_id ?? 0;
+                $item->food_id = $request->item_id ?? 0;
+                $item->menu_id = $request->parent_id ?? 0;
                 $item->portions = $request->portions ?? 1;
                 $item->save();
             }
