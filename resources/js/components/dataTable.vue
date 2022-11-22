@@ -32,14 +32,14 @@
                 <span :key="column.id" class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
                 <el-input
                     :key="column.id" 
-                    v-if="checkTypeAndVisibility(column.type, ['text', 'number'])" 
+                    v-if="checkTypeAndVisibility(scope.row, column.type, ['text', 'number'])" 
                     v-model="scope.row[column.id]" 
-                    ref="focus" 
-                    :type="column.type" 
+                    ref="focus"
+                    :type="column.type"
                     @click="stopPropagation($event)"
                 ></el-input>
                 <el-select 
-                    v-else-if="checkTypeAndVisibility(column.type, ['select'])" 
+                    v-else-if="checkTypeAndVisibility(scope.row, column.type, ['select'])" 
                     v-model="scope.row[column.od]" 
                     @click="stopPropagation($event)" 
                     placeholder="Select"
@@ -52,7 +52,7 @@
                     </el-option>
                 </el-select>
                 <el-date-picker
-                    v-else-if="checkTypeAndVisibility(column.type, ['date'])" 
+                    v-else-if="checkTypeAndVisibility(scope.row, column.type, ['date'])" 
                     @click="stopPropagation($event)"
                     v-model="scope.row[column.id]"
                     type="date"
@@ -73,11 +73,11 @@
                            size="small" type="success" @click="add(scope.$index)">Add
                 </el-button>
                 <el-button data-id="edit"
-                           v-if="checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index)"
-                           size="small" type="primary" @click="setEdit($event,scope.$index)">Edit
+                           v-if="!checkTypeAndVisibility(scope.row)"
+                           size="small" type="primary" @click="setEdit($event,scope.row)">Edit
                 </el-button>
                 <el-button data-id="update"
-                           v-if="checkProperty('edited',scope.$index) && checkProperty('created',scope.$index)"
+                           v-if="checkTypeAndVisibility(scope.row)"
                            size="small" type="success" @click="update(scope.$index)">Save
                 </el-button>
                 <el-button data-id="delete" v-if="checkProperty('created',scope.$index)" size="small" type="danger"
@@ -90,6 +90,7 @@
 
 <script>
     import { storeToRefs } from 'pinia';
+import { eventNames } from 'process';
 import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
     import {useStore} from 'vuex';
     import { useCalculationStore } from '../store/calculation'
@@ -125,23 +126,60 @@ import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, next
     ];
 
     export default defineComponent({
-        props: ['data', 'model', 'itemId', 'addAction', 'itemType', 'getAction', 'updateAction', 'loading', 'food', 'deleteAction', 'noRow' ],
-        emits: ['category', 'modal', 'loading', 'fetchItems','categories'],
+        props: {
+            data: {
+                type: Array
+            },
+            model: {
+                type: Object,
+                default: () => {}
+            },
+            itemId: {
+                type: Number
+            },
+            addAction: {
+                type: Function,
+                default: () => {}
+            },
+            getAction: {
+                type: Function,
+                default: () => {}
+            },
+            updateAction: {
+                type: Function,
+                default: () => {}
+            },
+            deleteAction: {
+                type: Function,
+                default: () => {}
+            },
+            itemType: {
+                type: String
+            },
+            loading: {
+                type: Boolean
+            },
+            food: {
+                type: String,
+            },
+            noRow: {
+                type: Boolean
+            },
+            "type": {
+                type: String
+            }
+        },
+        emits: ['category', 'modal', 'categories', 'getAction', 'updateAction', 'deleteAction', 'addAction'],
         setup(props, context) {
-            const store = useStore();
             const shared = useSharedStore()
             const { mode } = storeToRefs(shared)
-            const { data, model, itemId, addAction, itemType, getAction, updateAction, loading, food, deleteAction, noRow } = toRefs(props);
-            const setLoading = computed({
-                get: () => loading,
-                set: (v) => {
-                    context.emit('loading', v)
-                }
-            });
+            const { data, model, itemId, loading, food, noRow } = toRefs(props);
+            
             const filterColumns = computed(() => {
                 let row = rows.value[0]
+                if (!row) return []
                 return columns.filter(column => {
-                    if (row[column.id]) return true
+                    if (row.hasOwnProperty(column.id)) return true
                 })
             })
             const focus = ref(null);
@@ -150,90 +188,56 @@ import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, next
             const error = ref([]);
 
             const addRow = () => {
+                if (mode.value === 'edit') return
                 shared.setMode('edit')
-                rows.value.push({ ...model.value })
+                rows.value.push({ ...model.value, edited: true })
                 nextTick(() => {
-                    console.log(focus.value);
-                    focus.value.focus();
-                });
+                    focus.value[0].focus()
+                })
             }
 
             const add = (index) => {
-                shared.setMode("edit")
                 let data = { ...rows.value[index] };
-                let type = '';
-
-                switch (props.itemType) {
-                    case 'setIngredient':
-                        data.category_id = itemId.value;
-                        type = 'category_id';
-                        break;
-
-                    case 'addFood':
-                        data.group_id = itemId.value;
-                        type = 'group_id';
-                        break;
-                }
+                data.parent_id = itemId.value;
 
                 if (!data.name) {
                     error.value[index] = 'Name is empty'
                     return
                 }
 
-                addAction(data).then((r) => {
-                    loading.value = true;
-                    let params = {};
-                    let item = rows.value[index];
-                    params[type] = itemId.value;
-                    if (!item.hasOwnProperty('created') && item.name) {
-                        item.created = true;
-                        delete item.edited;
-                    }
-                    context.emit('fetchItems');
-                    store.dispatch(props.get, params).then(() => loading.value = false);
-                    shared.setMode("view")
-                });
+                context.emit('addAction', data)
+
+                shared.setLoading(true)
+                let params = {};
+                let item = rows.value[index];
+                if (!item.hasOwnProperty('created') && item.name) {
+                    item.created = true;
+                    item.edited = false
+                }
+                context.emit('getAction', params)
+                shared.setLoading(false)
+
+                shared.setMode("view")
             };
-            const update = (index) => {
-                let data = {...rows.value[index]};
+            const update = async (index) => {
                 let type = '';
 
-                switch (itemType) {
-                    case 'setIngredient':
-                        data.category_id = itemId.value;
-                        type = 'category_id';
-                        break;
-
-                    case 'setFood':
-                        data.group_id = itemId.value;
-                        type = 'group_id';
-                        break;
-                    case 'setFoodIngredient':
-                        data.food_id = itemId.value;
-                        type = 'food_id';
-                        break;
-                }
+                let data = {...rows.value[index]};
+                data.parent_id = itemId.value;
 
                 if (!data.name) return
-                store.dispatch(props.update, data).then(() => {
-                    loading.value = true;
-                    let params = {};
-                    params[type] = itemId.value;
+                context.emit('updateAction', data)
+                shared.setLoading(true)
 
-                    context.emit('fetchItems');
-                    store.dispatch(props.get, params).then(() => {
-                        loading.value = false;
-                        delete rows.value[index].edited;
-                    });
-                    shared.setMode("view")
-                });
-            };
-            const setEdit = (e, index) => {
+                context.emit('getAction')
+                shared.setLoading(false)
+                rows.value[index].edited = false
+                shared.setMode("view")
+            }
+
+            const setEdit = (e, row) => {
                 shared.setMode("edit")
-                setTimeout(() => {
-                    rows.value[index].edited = false;
-                }, 200)
-
+                row.edited = true;
             };
             const stopPropagation = (e) => {
                 e.stopImmediatePropagation();
@@ -241,27 +245,30 @@ import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, next
             const handleDelete = (index) => {
                 let data = rows.value[index];
                 if (!data.id) return
-                store.dispatch(props.delete, data).then(() => {
-                    rows.value.splice(index, 1);
-                    context.emit('fetchItems');
-                })
+
+                context.emit('deleteAction', data)
+
+                rows.value.splice(index, 1);
+
+                context.emit('getAction')
             };
             const select = () => {
                 selecting.value = !selecting.value;
-                context.emit('selecting',selecting.value);
+                context.emit('selecting', selecting.value);
             }
             const handleChange = (row, column, event) => {
+                event.stopImmediatePropagation()
                 if (typeof row.id !== "undefined") {
                     if(selecting.value){
-                        context.emit('categories',row.id);
+                        context.emit('categories', row.id);
                     }else{
-                        loading.value = true;
+                        shared.setLoading(true)
                         context.emit('category', row.id);
-                        rows.value.map((item, i) => {
-                            delete rows.value[i].edited
+                        rows.value.map((_, i) => {
+                            rows.value[i].edited = false
                         });
                         rows.value = rows.value.filter((item) => item.name)
-                        loading.value = false;
+                        shared.setLoading(false)
                     }
 
                     return 'active-row';
@@ -317,8 +324,8 @@ import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, next
                 return ''
             }
 
-            const checkTypeAndVisibility = (columnType, type) => {
-                if (mode.value == 'edit') return true
+            const checkTypeAndVisibility = (row, columnType, type) => {
+                if (row.edited) return true
                 if (type && !type.includes(columnType)) return false
                 if (rows.value.length) return rows.value[0].hasOwnProperty(columnType);
                 return false

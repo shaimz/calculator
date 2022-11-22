@@ -21,7 +21,6 @@ export const useIngredientStore = defineStore("ingredients", {
       if (!this.activeCategory) return []
       return await axios.get('/api/ingredient/' + this.activeCategory).then((r) => {
         let result = r.data
-        if (!result.length) return
 
         this.ingredients = result.map((item) => {
             return {
