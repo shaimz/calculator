@@ -84,7 +84,7 @@ export const useCalculationStore = defineStore("calculation", {
               }
       })
     },
-    async setFoodIngredient(context, payload){
+    async addFoodIngredient(context, payload){
         await axios.post('/api/food-ingredient', payload).then((r) => context.commit('ADD_FOOD_INGREDIENT', r.data))
     },
     async updateFoodIngredient(context, payload){

@@ -2,38 +2,38 @@
     <div id="categories">
         <h2>Groups</h2>
         <div id="groups-list">
-            <dataTable @loading="setLoading"
-                       @fetchItems="fetchGroups"
-                       :loading="loading"
-                       itemType="group"
-                       :key="groupRows.length"
-                       :get="'getGroups'"
-                       :add="'addGroup'"
-                       :update="'updateGroup'"
-                       @category="store.setActiveGroup"
-                       :item-id="group"
-                       :model="modelGroups"
-                       :data="groupRows">
+            <dataTable 
+                itemType="group"
+                :data="groupRows"
+                :loading="loading"
+                :key="groupRows.length"
+                :item-id="group"
+                :model="modelGroups"
+                @getAction="fetchGroups"
+                @addAction="store.addGroup"
+                @updateAction="store.updateGroup"
+                @loading="setLoading"
+                @fetchItems="fetchGroups"
+                @category="store.setActiveGroup">
             </dataTable>
         </div>
     </div>
     <div id="ingredients">
         <h2>Food and Ingredients</h2>
-        <div id="food-list" v-if="groupRows[0].created">
-            <dataTable itemType="food"
-                       @modal="toggleModal"
-                       @loading="setLoading"
-                       @fetchItems="fetchFoods"
-                       :loading="loading"
-                       :key="foodRows.length"
-                       :get="fetchFoods"
-                       @category="store.setActiveFood"
-                       :add="store.addFood"
-                       :update="store.updateFood"
-                       :item-id="group"
-                       :food="food"
-                       :model="modelFoods"
-                       :data="foodRows">
+        <div id="food-list" v-if="groupRows.length">
+            <dataTable 
+                itemType="food"
+                :loading="loading"
+                :key="foodRows.length"
+                :updateAction="store.updateFood"
+                :item-id="group"
+                :model="modelFoods"
+                :data="foodRows"
+                @getAction="fetchFoods"
+                @addAction="store.addFood"
+                @category="store.setActiveFood"
+                @modal="toggleModal"
+                @fetchItems="fetchFoods">
             </dataTable>
 
             <modal @fetchItems="fetchFoodIngredients(food)" :key="food" @modal="toggleModal" :itemId="food"
@@ -42,20 +42,19 @@
 
             <div id="food-ingredient-list">
                 <dataTable
-                        v-if="food_ingredientRows[0]"
+                        v-if="foodIngredientRows.length"
                         itemType="food_ingredient"
-                        @loading="setLoading"
-                        @fetchItems="fetchFoodIngredients(food)"
                         :loading="loading"
-                        :key="food_ingredientRows.length"
-                        :get="'getFoodIngredients'"
-                        :add="'setFoodIngredient'"
-                        :update="'updateFoodIngredient'"
-                        :delete="'deleteFoodIngredient'"
+                        :key="foodIngredientRows.length"
                         :item-id="food"
                         :model="modelFoodIngredients"
-                        :data="food_ingredientRows"
-                        :no-row="false">
+                        :data="foodIngredientRows"
+                        :no-row="false"
+                        @getAction="fetchFoodIngredients"
+                        @addAction="store.addFoodIngredient"
+                        @updateAction="store.updateFoodIngredient"
+                        @deleteAction="store.deleteFoodIngredient"
+                        @fetchItems="fetchFoodIngredients(food)">
                 </dataTable>
             </div>
         </div>
@@ -103,10 +102,10 @@
             const loading = ref(false)
 
             //Groups
-            let groupRows = ref([{ ...modelGroups }]);
+            let groupRows = ref([]);
             const group = computed(() => store.activeGroup)
 
-            let foodRows = ref([{ ...modelFoods }]);
+            let foodRows = ref([]);
             const food = computed(() => store.activeFood);
             const foodName = ref(null);
 
@@ -115,7 +114,7 @@
             const ingredients = computed(() => iStore.ingredients);
 
             //Ingredients
-            let food_ingredientRows = ref([{ ...modelFoodIngredients }]);
+            let foodIngredientRows = ref([]);
 
             const fetchGroups = async () => {
                 loading.value = true
@@ -135,7 +134,7 @@
             const fetchFoodIngredients = async () => {
                 loading.value = true;
                 let result = await store.fetchFoodIngredients()
-                if (result.length) food_ingredientRows.value = result
+                if (result.length) foodIngredientRows.value = result
                 loading.value = false;
             };
 
@@ -179,11 +178,12 @@
                 modelGroups,
                 ingredients,
                 store,
+                iStore,
                 group,
                 food,
                 foodName,
                 modelFoodIngredients,
-                food_ingredientRows,
+                foodIngredientRows,
                 categories,
                 loading,
                 setLoading,
