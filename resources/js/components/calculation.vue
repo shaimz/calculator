@@ -9,6 +9,7 @@
                 :key="groupRows.length"
                 :item-id="group"
                 :model="modelGroups"
+                :actions="['edit', 'save', 'delete']"
                 @getAction="fetchGroups"
                 @addAction="store.addGroup"
                 @updateAction="store.updateGroup"
@@ -29,6 +30,7 @@
                 :item-id="group"
                 :model="modelFoods"
                 :data="foodRows"
+                :actions="['edit', 'save', 'delete']"
                 @getAction="fetchFoods"
                 @addAction="store.addFood"
                 @category="store.setActiveFood"
@@ -42,7 +44,7 @@
 
             <div id="food-ingredient-list">
                 <dataTable
-                        v-if="foodIngredientRows.length"
+                        v-if="foodRows.length"
                         itemType="food_ingredient"
                         :loading="loading"
                         :key="foodIngredientRows.length"
@@ -50,6 +52,7 @@
                         :model="modelFoodIngredients"
                         :data="foodIngredientRows"
                         :no-row="false"
+                        :actions="['add', 'edit', 'save', 'delete']"
                         @getAction="fetchFoodIngredients"
                         @addAction="store.addFoodIngredient"
                         @updateAction="store.updateFoodIngredient"

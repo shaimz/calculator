@@ -66,12 +66,9 @@
 
         <el-table-column label="" width="200">
             <template #default="scope">
-                <el-button data-id="add_i"
-                           v-if="(checkProperty('created',scope.$index) && !checkProperty('edited',scope.$index) && props.get === 'getFoods') || props.get === 'getMenus'"
+                <el-button data-id="add"
+                           v-if="checkTypeAndVisibility('created', scope.row)"
                            size="small" type="success" icon="el-icon-plus" circle @click="addItems()"></el-button>
-                <el-button data-id="add" v-if="!checkProperty('created',scope.$index) && props.get !== 'getMenuItems'"
-                           size="small" type="success" @click="add(scope.$index)">Add
-                </el-button>
                 <el-button data-id="edit"
                            v-if="!checkTypeAndVisibility(scope.row)"
                            size="small" type="primary" @click="setEdit($event,scope.row)">Edit
@@ -90,8 +87,8 @@
 
 <script>
     import { storeToRefs } from 'pinia';
-import { eventNames } from 'process';
-import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
+    import { eventNames } from 'process';
+    import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
     import {useStore} from 'vuex';
     import { useCalculationStore } from '../store/calculation'
     import { useIngredientStore } from '../store/ingredients'
@@ -195,44 +192,29 @@ import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, next
                     focus.value[0].focus()
                 })
             }
-
-            const add = (index) => {
-                let data = { ...rows.value[index] };
+            const update = async (index) => {
+                shared.setLoading(true)
+                shared.setMode("edit")
+                let data = {...rows.value[index]};
                 data.parent_id = itemId.value;
 
                 if (!data.name) {
                     error.value[index] = 'Name is empty'
+                    shared.setMode("view")
+                    shared.setLoading(false)
                     return
                 }
 
-                context.emit('addAction', data)
-
-                shared.setLoading(true)
-                let params = {};
-                let item = rows.value[index];
-                if (!item.hasOwnProperty('created') && item.name) {
-                    item.created = true;
-                    item.edited = false
-                }
-                context.emit('getAction', params)
-                shared.setLoading(false)
-
-                shared.setMode("view")
-            };
-            const update = async (index) => {
-                let type = '';
-
-                let data = {...rows.value[index]};
-                data.parent_id = itemId.value;
-
-                if (!data.name) return
-                context.emit('updateAction', data)
-                shared.setLoading(true)
+                if (data.id) context.emit('updateAction', data)
+                else context.emit('addAction', data)
 
                 context.emit('getAction')
-                shared.setLoading(false)
+
+                rows.value[index].created = true
                 rows.value[index].edited = false
+
                 shared.setMode("view")
+                shared.setLoading(false)
             }
 
             const setEdit = (e, row) => {
@@ -350,7 +332,6 @@ import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, next
                 addRow,
                 handleDelete,
                 checkProperty,
-                add,
                 update,
                 handleChange,
                 cellClass,

@@ -1,5 +1,24 @@
 <template>
   <div class="m-0 px-1">
+  <el-table-column label="" width="200">
+    <template #default="scope">
+      <el-button data-id="add"
+                  v-if="checkTypeAndVisibility('created', scope.row)"
+                  size="small" type="success" icon="el-icon-plus" circle @click="addItems()"></el-button>
+      <el-button data-id="edit"
+                  v-if="!checkTypeAndVisibility(scope.row)"
+                  size="small" type="primary" @click="setEdit($event,scope.row)">Edit
+      </el-button>
+      <el-button data-id="update"
+                  v-if="checkTypeAndVisibility(scope.row)"
+                  size="small" type="success" @click="update(scope.$index)">Save
+      </el-button>
+      <el-button data-id="delete" v-if="checkProperty('created',scope.$index)" size="small" type="danger"
+                  @click="handleDelete(scope.$index)">Delete
+      </el-button>
+    </template>
+  </el-table-column>
+
     <button v-if="showButton('accept')" class="px-1 border-0 bg-transparent" @click.stop.prevent="emit('row-accept', indexRow, entry)" size="xs">
       <span class="icon-btns" role="img" title="Accept" v-b-tooltip.hover.noninteractive>
         <i class="sw-circle-check"></i>
