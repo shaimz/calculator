@@ -59,7 +59,10 @@ export const useIngredientStore = defineStore("ingredients", {
       await axios.delete(`/api/ingredient/${id}`, payload)
     },
     async fetchCategories(){
-      return await axios.get('/api/category').then((r) => r.data)
+      let result = await axios.get('/api/category').then((r) => r.data)
+      if (result.length && !this.activeCategory) this.setActiveCategory(result[0].id)
+      await this.fetchIngredients()
+      return result
     },
     async addCategory(data){
         await axios.post('/api/category', data).then((r) => {
@@ -78,6 +81,7 @@ export const useIngredientStore = defineStore("ingredients", {
         await axios.post(`/api/category/${id}`)
     },
     async setActiveCategory(id) {
+      if (id === this.activeCategory) return
       this.activeCategory = id
       await this.fetchIngredients()
     }

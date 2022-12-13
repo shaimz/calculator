@@ -2,7 +2,7 @@
     <div id="categories">
         <h2>Groups</h2>
         <div id="groups-list">
-            <dataTable 
+            <dataTable
                 itemType="group"
                 :data="groupRows"
                 :loading="loading"
@@ -10,10 +10,8 @@
                 :item-id="group"
                 :model="modelGroups"
                 :actions="['edit', 'save', 'delete']"
-                @getAction="fetchGroups"
                 @addAction="store.addGroup"
                 @updateAction="store.updateGroup"
-                @loading="setLoading"
                 @fetchItems="fetchGroups"
                 @category="store.setActiveGroup">
             </dataTable>
@@ -22,7 +20,7 @@
     <div id="ingredients">
         <h2>Food and Ingredients</h2>
         <div id="food-list" v-if="groupRows.length">
-            <dataTable 
+            <dataTable
                 itemType="food"
                 :loading="loading"
                 :key="foodRows.length"
@@ -31,14 +29,13 @@
                 :model="modelFoods"
                 :data="foodRows"
                 :actions="['edit', 'save', 'delete']"
-                @getAction="fetchFoods"
                 @addAction="store.addFood"
                 @category="store.setActiveFood"
                 @modal="toggleModal"
                 @fetchItems="fetchFoods">
             </dataTable>
 
-            <modal @fetchItems="fetchFoodIngredients(food)" :key="food" @modal="toggleModal" :itemId="food"
+            <modal @fetchItems="fetchFoodIngredients" :key="food" @modal="toggleModal" :itemId="food"
                    :type="'group'" :data="modalFoods" :group="group"
                    :dialog="modal"></modal>
 
@@ -53,11 +50,10 @@
                         :data="foodIngredientRows"
                         :no-row="false"
                         :actions="['add', 'edit', 'save', 'delete']"
-                        @getAction="fetchFoodIngredients"
                         @addAction="store.addFoodIngredient"
                         @updateAction="store.updateFoodIngredient"
                         @deleteAction="store.deleteFoodIngredient"
-                        @fetchItems="fetchFoodIngredients(food)">
+                        @fetchItems="fetchFoodIngredients">
                 </dataTable>
             </div>
         </div>
@@ -144,7 +140,6 @@
             (async () => {
                 await fetchGroups()
                 await iStore.fetchCategories()
-                await iStore.fetchIngredients()
                 await fetchFoods()
                 await fetchFoodIngredients()
             })()

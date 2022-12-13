@@ -1,18 +1,18 @@
 <template>
     <el-button type="success" v-if="noButton" @click="addRow()" round>Adding row</el-button>
     <el-button @click="select">{{selecting ? 'Cancel' : 'Select'}}</el-button>
-    <el-table 
-        :id="props.add + '-table'" 
-        :class="[noButton ? 'mt-4' : '']" 
-        :key="rows" 
-        :data="rows" 
-        :row-class-name="checkActive" 
-        :lazy="true" 
-        v-loading="loading" 
-        border 
+    <el-table
+        :id="props.add + '-table'"
+        :class="[noButton ? 'mt-4' : '']"
+        :key="rows"
+        :data="rows"
+        :row-class-name="checkActive"
+        :lazy="true"
+        v-loading="loading"
+        border
         height="350"
-        style="width:100%;margin-top: 15px;" 
-        current-row-key="40" 
+        style="width:100%;margin-top: 15px;"
+        current-row-key="40"
         @row-click="handleChange
     ">
         <el-table-column label="" width="50" v-if="checkProperty('type')">
@@ -22,8 +22,8 @@
                     class="rounded-circle bg-success active m-auto"></span>
             </template>
         </el-table-column>
-        <el-table-column 
-            v-for="column in filterColumns" 
+        <el-table-column
+            v-for="column in filterColumns"
             :key="column.id"
             :label="column.label"
             :width="column.width"
@@ -31,17 +31,17 @@
             <template #default="scope">
                 <span :key="column.id" class="text-danger" v-if="error[scope.$index]">{{error[scope.$index]}}</span>
                 <el-input
-                    :key="column.id" 
-                    v-if="checkTypeAndVisibility(scope.row, column.type, ['text', 'number'])" 
-                    v-model="scope.row[column.id]" 
+                    :key="column.id"
+                    v-if="checkTypeAndVisibility(scope.row, column.type, ['text', 'number'])"
+                    v-model="scope.row[column.id]"
                     ref="focus"
                     :type="column.type"
                     @click="stopPropagation($event)"
                 ></el-input>
-                <el-select 
-                    v-else-if="checkTypeAndVisibility(scope.row, column.type, ['select'])" 
-                    v-model="scope.row[column.od]" 
-                    @click="stopPropagation($event)" 
+                <el-select
+                    v-else-if="checkTypeAndVisibility(scope.row, column.type, ['select'])"
+                    v-model="scope.row[column.od]"
+                    @click="stopPropagation($event)"
                     placeholder="Select"
                 >
                     <el-option
@@ -52,7 +52,7 @@
                     </el-option>
                 </el-select>
                 <el-date-picker
-                    v-else-if="checkTypeAndVisibility(scope.row, column.type, ['date'])" 
+                    v-else-if="checkTypeAndVisibility(scope.row, column.type, ['date'])"
                     @click="stopPropagation($event)"
                     v-model="scope.row[column.id]"
                     type="date"
@@ -87,9 +87,7 @@
 
 <script>
     import { storeToRefs } from 'pinia';
-    import { eventNames } from 'process';
     import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
-    import {useStore} from 'vuex';
     import { useCalculationStore } from '../store/calculation'
     import { useIngredientStore } from '../store/ingredients'
     import { useSharedStore } from '../store/shared'
@@ -127,6 +125,10 @@
             data: {
                 type: Array
             },
+            actions: {
+                type: Array,
+                default: []
+            },
             model: {
                 type: Object,
                 default: () => {}
@@ -135,10 +137,6 @@
                 type: Number
             },
             addAction: {
-                type: Function,
-                default: () => {}
-            },
-            getAction: {
                 type: Function,
                 default: () => {}
             },
@@ -154,7 +152,8 @@
                 type: String
             },
             loading: {
-                type: Boolean
+                type: Boolean,
+                default: false
             },
             food: {
                 type: String,
@@ -166,12 +165,12 @@
                 type: String
             }
         },
-        emits: ['category', 'modal', 'categories', 'getAction', 'updateAction', 'deleteAction', 'addAction'],
+        emits: ['category', 'modal', 'categories', 'updateAction', 'deleteAction', 'addAction', 'fetchItems'],
         setup(props, context) {
             const shared = useSharedStore()
             const { mode } = storeToRefs(shared)
             const { data, model, itemId, loading, food, noRow } = toRefs(props);
-            
+
             const filterColumns = computed(() => {
                 let row = rows.value[0]
                 if (!row) return []
@@ -208,7 +207,7 @@
                 if (data.id) context.emit('updateAction', data)
                 else context.emit('addAction', data)
 
-                context.emit('getAction')
+                context.emit('fetchItems')
 
                 rows.value[index].created = true
                 rows.value[index].edited = false
@@ -229,10 +228,7 @@
                 if (!data.id) return
 
                 context.emit('deleteAction', data)
-
-                rows.value.splice(index, 1);
-
-                context.emit('getAction')
+                context.emit('fetchItems')
             };
             const select = () => {
                 selecting.value = !selecting.value;

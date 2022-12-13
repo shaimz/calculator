@@ -66,8 +66,6 @@ export const useCalculationStore = defineStore("calculation", {
       if (this.activeFood == id) return
       this.activeFood = id
       await this.fetchFoodIngredients()
-      return
-      await axios.post('/api/food', payload).then((r) => context.commit('ADD_FOOD', r.data))
     },
     async updateFood(context, payload){
         await axios.put('/api/food/'+payload.id, payload).then((r) => context.commit('EDIT_FOOD', r.data))
@@ -79,6 +77,7 @@ export const useCalculationStore = defineStore("calculation", {
           if(!item.ingredient.name) return {}
               return {
                  ...item,
+                 ...item.ingredient,
                   type: 'food_ingredient',
                   created: true,
               }
