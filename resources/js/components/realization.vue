@@ -6,33 +6,34 @@
                     @modal="toggleModal"
                     :loading="loading"
                     :key="menuRows"
-                    @addAction="addMenu"
-                    @updateAction="updateMenu"
-                    @category="setMenu"
-                    @categories="setMenus"
+                    @addAction="menuStore.addMenu"
+                    @updateAction="menuStore.updateMenu"
+                    @category="menuStore.setActiveMenu"
+                    @categories="() => {}"
                     @selecting="select"
                     @fetchItems="fetchMenus"
                     :item-id="menu"
                     :model="modelMenus"
-                    :rows="menuRows">
+                    :data="menuRows">
             </dataTable>
         </div>
     </div>
 
     <div id="ingredients">
         <h2>Menu Foods</h2>
-        <div id="food-list" v-if="menuRows[0].created" >
+        <div id="food-list" v-if="menuRows.length" >
             <dataTable @modal="toggleModal" :loading="loading" :key="menuItemRows"
                        @addAction="'setMenuItem'"
                        @updateAction="'updateMenuItem'"
+                       @fetchItems="fetchMenuItems"
                        :item-id="menu"
                        :food="item"
                        :model="modelMenuItems"
-                       :rows="menuItemRows"
+                       :data="menuItemRows"
                        :no-row="false">
             </dataTable>
 
-            <modal @fetchItems="fetchItems(menu)" @modal="toggleModal" :itemId="menu" :type="'menu'"
+            <modal @fetchItems="fetchMenuItems()" @modal="toggleModal" :itemId="menu" :type="'menu'"
                    :data="modalMenuItems" :menu="itemName"
                    :dialog="modal"></modal>
         </div>
@@ -58,6 +59,14 @@
         menu_id: 0,
         type: 'food'
     }
+
+    const modelMenus = {
+        name: '',
+        type: 'menu',
+        date: '',
+        edited: false
+    };
+
     export default defineComponent({
         components: {dataTable, modal},
         setup() {
@@ -66,16 +75,15 @@
             const modal = ref(false);
             const loading = ref(false);
 
-            let modelMenus = ref({name: '', type: 'menu', date: '', edited: false});
-            let menuRows = ref([modelMenus.value]);
-            const menus = computed(() => menuStore.menus);
-            const menu = storeToRefs(menuStore, 'menu')
+            let menuRows = ref([]);
+            const { menus } = storeToRefs(menuStore);
+            const menu = computed(() => menuStore.activeMenu)
             const menuList = ref([]);
 
             const fetchMenus = async () => {
                 loading.value = true;
                 await menuStore.fetchMenus()
-                menuRows.value = menus.value.map((menu) => {
+                menuRows.value = menus.value.map(menu => {
                     return {
                         id: menu.id || null,
                         name: menu.name || '',
@@ -90,6 +98,7 @@
 
             (async () => {
                 await fetchMenus()
+                await fetchMenuItems()
                 await calculationStore.fetchGroups()
             })()
 
@@ -106,9 +115,8 @@
             }
 
             //Items
-            const foods = computed(() => menuStore.foods);
+            const foods = computed(() => calculationStore.foods);
             const groups = computed(() => calculationStore.groups);
-            const items = computed(() => menuStore.menu_items);
 
             const modalMenuItems = computed(() => groups.value.map((item) => {
                 return {
@@ -129,41 +137,14 @@
             }));
 
             let menuItemRows = ref([])
-            const item = computed(() => typeof foods.value[0] !== 'undefined' ? foods.value[0].id : null);
-            const itemName = computed(() => typeof menus.value[0] !== 'undefined' ? menus.value[0].name : null);
+            const item = computed(() => null);
+            const itemName = computed(() => null);
 
-            const fetchItems = async (menu_id) => {
-                if (menu_id) {
-                    loading.value = true;
-                    await store.dispatch('getMenuItems', {menu_id: menu_id}).then(() => {
-                        loading.value = false;
-                        if (items.value.length) {
-                            menuItemRows.value = items.value.map((item) => {
-                                console.log(item)
-                                return {
-                                    id: typeof item.id !== 'undefined' ? item.id : null,
-                                    name: typeof item.food.name !== 'undefined' ? item.food.name : '',
-                                    menu_id: typeof menu_id !== 'undefined' ? menu_id : null,
-                                    food_id: typeof item.food_id !== 'undefined' ? item.food_id : null,
-                                    group_id: typeof item.food.group_id !== 'undefined' ? item.food.group_id : null,
-                                    price_portion: typeof item.food.price_portion !== 'undefined' ? item.food.price_portion : 0,
-                                    portions: typeof item.portions !== 'undefined' ? item.portions : 1,
-                                    type: 'food',
-                                }
-                            })
-                        } else {
-                            menuItemRows.value = [{...modelMenuItems.value}];
-                        }
-                    });
-                }
+            const fetchMenuItems = async () => {
+                loading.value = true;
+                menuItemRows.value = await menuStore.fetchMenuItems()
+                loading.value = false;
             };
-
-            watch(() => menu.value,
-                (n, o) => {
-                    if (n !== o) {
-                        fetchItems(menu.value)
-                    }
-                }, {immediate: true});
 
             const toggleModal = (v) => {
                 modal.value = v
@@ -218,9 +199,12 @@
                 item,
                 itemName,
                 selecting,
+                menuStore,
+                loading,
                 setMenu,
                 toggleModal,
-                fetchItems,
+                fetchMenus,
+                fetchMenuItems,
                 exportFile,
                 setLoading,
                 setMenus,

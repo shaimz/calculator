@@ -35,10 +35,11 @@
 </template>
 
 <script>
-    import {defineComponent, ref, computed, watch, toRefs, onMounted} from 'vue';
+    import {defineComponent, ref, computed, watch } from 'vue';
     import {useStore} from 'vuex';
     import { useCalculationStore } from '../store/calculation'
     import { useIngredientStore } from '../store/ingredients'
+    import { useMenuStore } from '../store/menu'
     import ElTransferGroup from "./transfer/el-transfer-group";
 
     export default defineComponent({
@@ -46,9 +47,9 @@
         props:['dialog','itemId','group','data','reset','name','menu','type'],
         emits:['modal','fetchItems'],
         setup(props, context){
-            const store = useStore();
             const ingredientStore = useIngredientStore()
             const calculationStore = useCalculationStore()
+            const menuStore = useMenuStore()
             const dialog = computed(() => props.dialog);
             const modal = ref(dialog.value);
             const data = computed(() => props.data);
@@ -60,7 +61,7 @@
 
             const checked = ref([]);
             const foodIngredients = computed(() => calculationStore.food_ingredients);
-            const items = computed(() => store.state.menu_items);
+            const items = computed(() => menuStore.menu_items);
 
             const right = computed(() => {
                 if(props.type === 'group'){
@@ -76,7 +77,17 @@
                         }
                     }).filter(it => it);
                 }else{
-                    return items.value.map((item,index) => {return {key:item.food_id,name:item.food.name,price_portion:item.food.price_portion,portions:item.food.portions,menu_id:item.menu_id,group_id:item.food.group_id, fixed:true}})
+                    return items.value.map(item => {
+                        return {
+                            key: item.food_id,
+                            name: item.name,
+                            price_portion: item.price_portion,
+                            portions: item.portions,
+                            menu_id: item.menu_id,
+                            group_id: item.group_id,
+                            fixed: true
+                        }
+                    })
                 }
             });
             // const left = computed(() => {
@@ -134,10 +145,8 @@
                             result.map((item) => quantity.value[item.ingredient_id] = item.quantity)
                             return
                         }
-                        store.dispatch('getMenuItems',{menu_id:itemId.value}).then(() => {
-                        console.log(items.value);
-                            items.value.map((item) => price.value[item.food_id] = item.portions)
-                        });
+                        context.emit('fetchItems')
+                        items.value.map((item) => price.value[item.food_id] = item.portions)
 
                     }
                 }

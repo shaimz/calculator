@@ -11,7 +11,7 @@ export const useMenuStore = defineStore("menu", {
     async fetchMenus(){
       let result = await axios.get('/api/menu').then((r) => r.data)
       if (!result.length) return
-      if (!this.activeGroup) this.setActiveGroup(result[0].id)
+      if (!this.activeGroup) this.setActiveMenu(result[0].id)
       this.menus = result
     },
     async addMenu(data){
@@ -28,13 +28,25 @@ export const useMenuStore = defineStore("menu", {
     },
     async setActiveMenu(id){
       if (id == this.activeMenu) return
-      this.activeGroup = id
-      await this.fetchMenus()
+      this.activeMenu = id
+      await this.fetchMenuItems()
     },
     async fetchMenuItems(){
         let result = await axios.get('/api/menu-item/' + this.activeMenu).then((r) => r.data)
         if (!result.length) return
-        this.menu_items = result
+        return result.map((item) => {
+          console.log(item)
+          return {
+              id: item.id || null,
+              name: item.food.name || '',
+              menu_id: this.activeMenu || null,
+              food_id: item.food_id || null,
+              group_id: item.food.group_id || null,
+              price_portion: item.food.price_portion || 0,
+              portions: item.portions || 1,
+              type: 'food',
+          }
+      })
     },
     async addMenuItem(data){
         let result = await axios.post('/api/menu-item', data).then((r) => r.data)

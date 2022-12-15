@@ -87,9 +87,7 @@
 
 <script>
     import { storeToRefs } from 'pinia';
-    import {defineComponent, ref, reactive, computed, toRefs, toRef, onMounted, nextTick} from 'vue';
-    import { useCalculationStore } from '../store/calculation'
-    import { useIngredientStore } from '../store/ingredients'
+    import {defineComponent, ref, computed, toRefs, nextTick} from 'vue';
     import { useSharedStore } from '../store/shared'
     import { columns } from './dataTableColumns'
 
